@@ -1,4 +1,5 @@
 export type Category = 'king-queen' | 'prince-princess';
+export type CandidateType = 'king' | 'queen' | 'prince' | 'princess';
 export type UserRole = 'admin' | 'vote_moderator' | 'user';
 export type Gender = 'male' | 'female';
 
@@ -8,6 +9,7 @@ export interface UTSelection {
   gender: Gender;
   profileImg: string;
   category: Category;
+  candidateType: CandidateType;
   major: string;
   description: string;
   images: SelectionImage[];
@@ -23,7 +25,7 @@ export interface SelectionImage {
 
 export interface Vote {
   id: string;
-  userId: string;
+  pinCode: string;
   selectionId: string;
   votedAt: Date;
 }
@@ -52,4 +54,9 @@ export interface ActivityLog {
   action: string;
   timestamp: Date;
   user: string;
+}
+
+export interface PinCodeVote {
+  pinCode: string;
+  votedAt: Date;
 }

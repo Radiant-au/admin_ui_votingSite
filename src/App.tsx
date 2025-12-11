@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Candidates from "./pages/Candidates";
 import VotingControl from "./pages/VotingControl";
 import Connections from "./pages/Connections";
+import Moderators from "./pages/Moderators";
 import NotFound from "./pages/NotFound";
 import { useVotingStore } from "./store/votingStore";
 
@@ -15,15 +16,8 @@ const queryClient = new QueryClient();
 
 function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) {
   const { currentUser } = useVotingStore();
-  
-  if (!currentUser) {
-    return <Navigate to="/" replace />;
-  }
-  
-  if (adminOnly && currentUser.role !== 'admin') {
-    return <Navigate to="/dashboard" replace />;
-  }
-  
+  if (!currentUser) return <Navigate to="/" replace />;
+  if (adminOnly && currentUser.role !== 'admin') return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 }
 
@@ -35,26 +29,11 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/candidates" element={
-            <ProtectedRoute>
-              <Candidates />
-            </ProtectedRoute>
-          } />
-          <Route path="/voting-control" element={
-            <ProtectedRoute adminOnly>
-              <VotingControl />
-            </ProtectedRoute>
-          } />
-          <Route path="/connections" element={
-            <ProtectedRoute adminOnly>
-              <Connections />
-            </ProtectedRoute>
-          } />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/candidates" element={<ProtectedRoute><Candidates /></ProtectedRoute>} />
+          <Route path="/moderators" element={<ProtectedRoute adminOnly><Moderators /></ProtectedRoute>} />
+          <Route path="/voting-control" element={<ProtectedRoute adminOnly><VotingControl /></ProtectedRoute>} />
+          <Route path="/connections" element={<ProtectedRoute adminOnly><Connections /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
