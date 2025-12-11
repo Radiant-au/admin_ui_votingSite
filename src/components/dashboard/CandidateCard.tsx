@@ -26,11 +26,11 @@ export function CandidateCard({ candidate, index }: CandidateCardProps) {
 
   return (
     <Card 
-      className="golden-card overflow-hidden group hover:border-primary/40 transition-all duration-300 animate-scale-in"
-      style={{ animationDelay: `${index * 0.1}s` }}
+      className="golden-card overflow-hidden group hover:border-primary/40 transition-all duration-300 animate-scale-in h-full"
+      style={{ animationDelay: `${index * 0.05}s` }}
     >
       <CardContent className="p-0">
-        <div className="relative aspect-[4/5] overflow-hidden">
+        <div className="relative aspect-[3/4] overflow-hidden">
           <img 
             src={candidate.profileImg} 
             alt={candidate.name}
@@ -38,28 +38,28 @@ export function CandidateCard({ candidate, index }: CandidateCardProps) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
           
-          <Badge className={`absolute top-3 right-3 ${config.color} border backdrop-blur-sm`}>
-            <Icon className="h-3 w-3 mr-1" />
-            {config.label}
+          <Badge className={`absolute top-2 right-2 ${config.color} border backdrop-blur-sm text-[10px] md:text-xs px-1.5 py-0.5 md:px-2 md:py-1`}>
+            <Icon className="h-2.5 w-2.5 md:h-3 md:w-3 mr-0.5 md:mr-1" />
+            <span className="hidden sm:inline">{config.label}</span>
           </Badge>
           
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <h3 className="font-display text-lg font-semibold text-foreground truncate">{candidate.name}</h3>
-            <p className="text-sm text-muted-foreground truncate">{candidate.major}</p>
+          <div className="absolute bottom-0 left-0 right-0 p-2 md:p-4">
+            <h3 className="font-display text-xs md:text-lg font-semibold text-foreground truncate">{candidate.name}</h3>
+            <p className="text-[10px] md:text-sm text-muted-foreground truncate">{candidate.major}</p>
           </div>
         </div>
         
-        <div className="p-4 space-y-3 border-t border-border/30">
+        <div className="p-2 md:p-4 space-y-2 md:space-y-3 border-t border-border/30">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Votes</span>
-            <span className="font-display text-lg font-bold text-primary">{candidate.voteCount.toLocaleString()}</span>
+            <span className="text-[10px] md:text-sm text-muted-foreground">Votes</span>
+            <span className="font-display text-sm md:text-lg font-bold text-primary">{candidate.voteCount.toLocaleString()}</span>
           </div>
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs">
+          <div className="space-y-1">
+            <div className="flex justify-between text-[10px] md:text-xs">
               <span className="text-muted-foreground">Share</span>
               <span className="text-primary font-medium">{percentage.toFixed(1)}%</span>
             </div>
-            <Progress value={percentage} className="h-2 bg-muted" />
+            <Progress value={percentage} className="h-1.5 md:h-2 bg-muted" />
           </div>
         </div>
       </CardContent>
