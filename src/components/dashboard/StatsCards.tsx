@@ -1,14 +1,13 @@
 import { useVotingStore } from '@/store/votingStore';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Vote, Crown, TrendingUp } from 'lucide-react';
+import { Users, Vote, KeyRound, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function StatsCards() {
-  const { candidates, getTotalVotes, getCandidatesByCategory, votingStatus } = useVotingStore();
+  const { candidates, getTotalVotes, getTotalPinCodesVoted, votingStatus } = useVotingStore();
   
   const totalVotes = getTotalVotes();
-  const kingQueenCount = getCandidatesByCategory('king-queen').length;
-  const princePrincessCount = getCandidatesByCategory('prince-princess').length;
+  const totalPinCodes = getTotalPinCodesVoted();
 
   const stats = [
     {
@@ -22,15 +21,15 @@ export function StatsCards() {
       label: 'Total Candidates',
       value: candidates.length,
       icon: Users,
-      color: 'text-accent',
-      bgColor: 'bg-accent/10',
+      color: 'text-gold',
+      bgColor: 'bg-gold/10',
     },
     {
-      label: 'King & Queen',
-      value: kingQueenCount,
-      icon: Crown,
-      color: 'text-warning',
-      bgColor: 'bg-warning/10',
+      label: 'PinCodes Voted',
+      value: totalPinCodes,
+      icon: KeyRound,
+      color: 'text-accent',
+      bgColor: 'bg-accent/10',
     },
     {
       label: 'Voting Status',
@@ -46,18 +45,19 @@ export function StatsCards() {
       {stats.map((stat, index) => (
         <Card 
           key={stat.label}
-          className="glass-card animate-slide-up"
+          className="golden-card animate-slide-up overflow-hidden"
           style={{ animationDelay: `${index * 0.1}s` }}
         >
-          <CardContent className="p-4 md:p-6">
+          <CardContent className="p-4 md:p-6 relative">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full" />
             <div className="flex items-center gap-3 md:gap-4">
-              <div className={cn("p-2 md:p-3 rounded-xl", stat.bgColor)}>
+              <div className={cn("p-2 md:p-3 rounded-xl border border-primary/20", stat.bgColor)}>
                 <stat.icon className={cn("h-5 w-5 md:h-6 md:w-6", stat.color)} />
               </div>
               <div>
                 <p className="text-xs md:text-sm text-muted-foreground">{stat.label}</p>
                 <p className={cn(
-                  "text-xl md:text-2xl font-bold",
+                  "text-xl md:text-2xl font-bold font-display",
                   stat.label === 'Voting Status' ? stat.color : 'text-foreground'
                 )}>
                   {stat.value}
