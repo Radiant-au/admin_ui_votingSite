@@ -65,24 +65,24 @@ export function VoteCharts() {
             className="golden-card animate-slide-up overflow-hidden"
           >
             <CardHeader className="p-2 pb-1 md:p-4 md:pb-2">
-              <CardTitle className="text-[10px] md:text-base font-display flex items-center gap-1">
+              <CardTitle className="text-xs md:text-base font-display flex items-center gap-1">
                 <chart.icon className="h-3 w-3 md:h-4 md:w-4 text-primary" />
                 <span className="golden-text">{chart.title}</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-1 md:p-4 pt-0">
+            <CardContent className="p-2 md:p-4 pt-0">
               {/* Selected name display */}
-              <div className="h-5 md:h-7 flex items-center justify-center">
+              <div className="h-6 md:h-8 flex items-center justify-center">
                 {selectedEntry && (
-                  <div className="px-1.5 py-0.5 rounded-full bg-primary/20 border border-primary/30 animate-fade-in">
-                    <span className="text-[8px] md:text-xs font-medium golden-text truncate max-w-full">
+                  <div className="px-2 py-0.5 rounded-full bg-primary/20 border border-primary/30 animate-fade-in">
+                    <span className="text-[9px] md:text-sm font-medium golden-text truncate max-w-full">
                       {selectedEntry.name}: {selectedEntry.value}
                     </span>
                   </div>
                 )}
               </div>
               
-              <div className="h-24 md:h-40">
+              <div className="h-36 md:h-52">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
