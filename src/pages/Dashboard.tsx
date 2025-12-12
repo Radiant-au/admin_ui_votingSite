@@ -1,6 +1,6 @@
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { StatsCards } from '@/components/dashboard/StatsCards';
-import { CandidateCarousel } from '@/components/dashboard/CandidateCarousel';
+import { CategoryTabs } from '@/components/dashboard/CategoryTabs';
 import { VoteCharts } from '@/components/dashboard/VoteCharts';
 import { useVotingStore } from '@/store/votingStore';
 
@@ -14,29 +14,29 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="space-y-6 md:space-y-8">
         {/* Header */}
         <div className="animate-fade-in">
-          <h1 className="text-2xl md:text-3xl font-display golden-text">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Overview of voting statistics</p>
+          <h1 className="text-xl md:text-3xl font-display golden-text">Dashboard</h1>
+          <p className="text-muted-foreground text-sm mt-1">Overview of voting statistics</p>
         </div>
 
         {/* Stats */}
         <StatsCards />
 
         {/* Charts - 2 columns */}
-        <section className="space-y-4">
-          <h2 className="text-xl font-display golden-text">Vote Distribution</h2>
+        <section className="space-y-3">
+          <h2 className="text-lg md:text-xl font-display golden-text">Vote Distribution</h2>
           <VoteCharts />
         </section>
 
-        {/* Candidate Carousels */}
-        <div className="space-y-8">
-          <CandidateCarousel candidates={kingCandidates} title="King" type="king" />
-          <CandidateCarousel candidates={queenCandidates} title="Queen" type="queen" />
-          <CandidateCarousel candidates={princeCandidates} title="Prince" type="prince" />
-          <CandidateCarousel candidates={princessCandidates} title="Princess" type="princess" />
-        </div>
+        {/* Swipeable Category Tabs */}
+        <CategoryTabs
+          kingCandidates={kingCandidates}
+          queenCandidates={queenCandidates}
+          princeCandidates={princeCandidates}
+          princessCandidates={princessCandidates}
+        />
       </div>
     </DashboardLayout>
   );

@@ -53,7 +53,7 @@ export function VoteCharts() {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:gap-6">
+    <div className="grid grid-cols-2 gap-2 md:gap-4">
       {chartConfig.map((chart) => {
         const selectedEntry = activeIndex[chart.key] !== null && activeIndex[chart.key] !== undefined
           ? chart.data[activeIndex[chart.key]!]
@@ -62,38 +62,36 @@ export function VoteCharts() {
         return (
           <Card 
             key={chart.title}
-            className="golden-card animate-slide-up"
+            className="golden-card animate-slide-up overflow-hidden"
           >
-            <CardHeader className="p-3 md:pb-2 md:p-6">
-              <CardTitle className="text-xs md:text-lg font-display flex items-center gap-1 md:gap-2">
-                <div className="p-1 md:p-1.5 rounded-lg bg-primary/10 border border-primary/20">
-                  <chart.icon className="h-3 w-3 md:h-4 md:w-4 text-primary" />
-                </div>
+            <CardHeader className="p-2 pb-1 md:p-4 md:pb-2">
+              <CardTitle className="text-[10px] md:text-base font-display flex items-center gap-1">
+                <chart.icon className="h-3 w-3 md:h-4 md:w-4 text-primary" />
                 <span className="golden-text">{chart.title}</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-2 md:p-6 pt-0">
+            <CardContent className="p-1 md:p-4 pt-0">
               {/* Selected name display */}
-              <div className="h-6 md:h-8 flex items-center justify-center mb-1">
+              <div className="h-5 md:h-7 flex items-center justify-center">
                 {selectedEntry && (
-                  <div className="px-2 py-1 rounded-full bg-primary/20 border border-primary/30 animate-fade-in">
-                    <span className="text-xs md:text-sm font-medium golden-text">
-                      {selectedEntry.name}: {selectedEntry.value} votes
+                  <div className="px-1.5 py-0.5 rounded-full bg-primary/20 border border-primary/30 animate-fade-in">
+                    <span className="text-[8px] md:text-xs font-medium golden-text truncate max-w-full">
+                      {selectedEntry.name}: {selectedEntry.value}
                     </span>
                   </div>
                 )}
               </div>
               
-              <div className="h-32 md:h-56">
+              <div className="h-24 md:h-40">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={chart.data}
                       cx="50%"
-                      cy="50%"
-                      innerRadius={20}
-                      outerRadius={40}
-                      paddingAngle={3}
+                      cy="45%"
+                      innerRadius="30%"
+                      outerRadius="55%"
+                      paddingAngle={2}
                       dataKey="value"
                       stroke="hsl(30, 10%, 8%)"
                       strokeWidth={1}
@@ -106,9 +104,9 @@ export function VoteCharts() {
                           fill={entry.fill}
                           style={{ 
                             filter: activeIndex[chart.key] === index 
-                              ? 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.8))' 
-                              : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
-                            transform: activeIndex[chart.key] === index ? 'scale(1.05)' : 'scale(1)',
+                              ? 'drop-shadow(0 0 6px rgba(255, 215, 0, 0.8))' 
+                              : 'none',
+                            transform: activeIndex[chart.key] === index ? 'scale(1.02)' : 'scale(1)',
                             transformOrigin: 'center',
                             transition: 'all 0.2s ease'
                           }}
@@ -119,22 +117,19 @@ export function VoteCharts() {
                       contentStyle={{ 
                         backgroundColor: 'hsl(30, 15%, 10%)',
                         border: '1px solid hsl(45, 90%, 55%, 0.3)',
-                        borderRadius: '0.75rem',
+                        borderRadius: '0.5rem',
                         color: 'hsl(45, 30%, 96%)',
-                        boxShadow: '0 4px 20px rgba(212, 175, 55, 0.2)',
-                        fontSize: '12px',
-                        padding: '8px 12px'
+                        fontSize: '10px',
+                        padding: '4px 8px'
                       }}
-                      formatter={(value: number, name: string) => [`${value} votes`, name]}
+                      formatter={(value: number, name: string) => [`${value}`, name.split(' ')[0]]}
                     />
                     <Legend 
-                      wrapperStyle={{ 
-                        fontSize: '10px',
-                        paddingTop: '8px'
-                      }}
+                      wrapperStyle={{ fontSize: '8px' }}
+                      iconSize={6}
                       formatter={(value) => (
-                        <span style={{ color: 'hsl(40, 15%, 70%)', fontSize: '10px' }}>
-                          {value.split(' ')[0]}
+                        <span style={{ color: 'hsl(40, 15%, 70%)', fontSize: '8px' }}>
+                          {value.split(' ')[0].slice(0, 6)}
                         </span>
                       )}
                     />
