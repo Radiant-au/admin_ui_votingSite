@@ -115,7 +115,7 @@ export function VoteCharts() {
                         />
                       ))}
                     </Pie>
-                    <Tooltip 
+                    {/* <Tooltip 
                       contentStyle={{ 
                         backgroundColor: 'hsl(30, 15%, 10%)',
                         border: '1px solid hsl(45, 90%, 55%, 0.3)',
@@ -126,7 +126,7 @@ export function VoteCharts() {
                         padding: '8px 12px'
                       }}
                       formatter={(value: number, name: string) => [`${value} votes`, name]}
-                    />
+                    /> */}
                     <Legend 
                       wrapperStyle={{ 
                         fontSize: '10px',

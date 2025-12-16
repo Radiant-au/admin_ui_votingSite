@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { UTSelection, VotingStatus, SSEConnection, ActivityLog, User, Category, CandidateType, PinCodeVote } from '@/types';
+import { apiJson, apiRequest, getApiBaseUrl } from '@/lib/apiClient';
 
-// Mock data with candidateType
 const mockCandidates: UTSelection[] = [
   // Kings
   { id: '1', name: 'Marcus Thompson', gender: 'male', profileImg: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400', category: 'king-queen', candidateType: 'king', major: 'Business Administration', description: 'Dedicated to community service.', images: [], voteCount: 312 },
@@ -32,7 +32,6 @@ const mockCandidates: UTSelection[] = [
   { id: '20', name: 'Ava Thomas', gender: 'female', profileImg: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400', category: 'prince-princess', candidateType: 'princess', major: 'Journalism', description: 'Truth seeker.', images: [], voteCount: 127 },
 ];
 
-// Mock pinCode votes
 const mockPinCodeVotes: PinCodeVote[] = [
   { pinCode: 'PIN001', votedAt: new Date(Date.now() - 3600000) },
   { pinCode: 'PIN002', votedAt: new Date(Date.now() - 7200000) },
@@ -50,29 +49,24 @@ const mockActivityLogs: ActivityLog[] = [
   { id: '3', action: 'Voting closed', timestamp: new Date(Date.now() - 86400000), user: 'admin' },
 ];
 
-// Mock users for authentication
-const mockUsers: { username: string; password: string; user: User }[] = [
-  { username: 'admin', password: 'admin123', user: { id: '1', username: 'admin', role: 'admin' } },
-  { username: 'moderator', password: 'mod123', user: { id: '2', username: 'moderator', role: 'vote_moderator' } },
-];
+const TOKEN_STORAGE_KEY = 'admin_token';
 
 interface VotingStore {
   // Auth
   currentUser: User | null;
-  users: { username: string; password: string; user: User }[];
-  login: (username: string, password: string) => boolean;
+  authToken: string | null;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
-  addModerator: (username: string, password: string) => void;
+  addModerator: (username: string, password: string) => Promise<void>;
   
-  // Candidates
+  // Candidates (server state now handled by TanStack Query)
   candidates: UTSelection[];
-  addCandidate: (candidate: Omit<UTSelection, 'id' | 'voteCount' | 'images'>) => void;
-  updateCandidate: (id: string, candidate: Partial<UTSelection>) => void;
-  deleteCandidate: (id: string) => void;
   
   // Voting Status
   votingStatus: VotingStatus;
-  toggleVoting: () => void;
+  fetchVotingStatus: () => Promise<void>;
+  startVotingStatusSse: () => () => void;
+  toggleVoting: () => Promise<void>;
   
   // PinCode Votes
   pinCodeVotes: PinCodeVote[];
@@ -93,79 +87,91 @@ interface VotingStore {
   getVotesByType: (type: CandidateType) => number;
 }
 
+type AdminLoginResponse = { token: string };
+type BackendAppStatusResponse = { status: boolean };
+type BackendChangeStatusResponse = { success: boolean; status: boolean };
+
 export const useVotingStore = create<VotingStore>((set, get) => ({
-  currentUser: null,
-  users: mockUsers,
-  
-  login: (username: string, password: string) => {
-    const found = get().users.find(u => u.username === username && u.password === password);
-    if (found) {
-      set({ currentUser: found.user });
-      return true;
-    }
-    return false;
+  currentUser: localStorage.getItem(TOKEN_STORAGE_KEY) ? { id: '0', username: 'admin', role: 'admin' } : null,
+  authToken: localStorage.getItem(TOKEN_STORAGE_KEY),
+
+  login: async (username: string, password: string) => {
+    const resp = await apiJson<AdminLoginResponse>('/auth/Alogin', { username, password }, { auth: false });
+    localStorage.setItem(TOKEN_STORAGE_KEY, resp.token);
+    set({
+      authToken: resp.token,
+      currentUser: { id: '0', username, role: 'admin' },
+    });
+    return true;
   },
-  
-  logout: () => set({ currentUser: null }),
-  
-  addModerator: (username: string, password: string) => {
-    const newUser: User = {
-      id: Date.now().toString(),
-      username,
-      role: 'vote_moderator',
-    };
-    set((state) => ({
-      users: [...state.users, { username, password, user: newUser }],
-    }));
+
+  logout: () => {
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+    set({ currentUser: null, authToken: null });
+  },
+
+  addModerator: async (username: string, password: string) => {
+    // Backend does not currently expose moderator management endpoints.
+    // Keep UI behavior by logging activity only.
     get().addActivityLog(`New moderator "${username}" added`);
+    void password;
   },
-  
+
   candidates: mockCandidates,
-  
-  addCandidate: (candidate) => {
-    const newCandidate: UTSelection = {
-      ...candidate,
-      id: Date.now().toString(),
-      voteCount: 0,
-      images: [],
-    };
-    set((state) => ({ 
-      candidates: [...state.candidates, newCandidate] 
-    }));
-    get().addActivityLog(`New candidate "${candidate.name}" added`);
-  },
-  
-  updateCandidate: (id, updates) => {
-    set((state) => ({
-      candidates: state.candidates.map(c => 
-        c.id === id ? { ...c, ...updates } : c
-      ),
-    }));
-    get().addActivityLog(`Candidate updated`);
-  },
-  
-  deleteCandidate: (id) => {
-    const candidate = get().candidates.find(c => c.id === id);
-    set((state) => ({
-      candidates: state.candidates.filter(c => c.id !== id),
-    }));
-    if (candidate) {
-      get().addActivityLog(`Candidate "${candidate.name}" deleted`);
-    }
-  },
-  
+
   votingStatus: {
     id: '1',
     isOpen: true,
     updatedAt: new Date(),
     updatedBy: 'admin',
   },
-  
-  toggleVoting: () => {
+
+  fetchVotingStatus: async () => {
+    const resp = await apiRequest<BackendAppStatusResponse>('/appStatus', { auth: false });
     set((state) => ({
       votingStatus: {
         ...state.votingStatus,
-        isOpen: !state.votingStatus.isOpen,
+        isOpen: !!resp.status,
+        updatedAt: new Date(),
+        updatedBy: state.currentUser?.username || 'system',
+      },
+    }));
+  },
+
+  startVotingStatusSse: () => {
+    const url = `${getApiBaseUrl()}/appStatus`;
+    const es = new EventSource(url);
+
+    es.onmessage = (evt) => {
+      try {
+        const data = JSON.parse(evt.data) as BackendAppStatusResponse;
+        set((state) => ({
+          votingStatus: {
+            ...state.votingStatus,
+            isOpen: !!data.status,
+            updatedAt: new Date(),
+            updatedBy: state.currentUser?.username || 'system',
+          },
+        }));
+      } catch {
+        // ignore malformed event
+      }
+    };
+
+    return () => {
+      es.close();
+    };
+  },
+
+  toggleVoting: async () => {
+    const desired = !get().votingStatus.isOpen;
+    const resp = await apiRequest<BackendChangeStatusResponse>(`/appStatus/${desired}`, {
+      method: 'PUT',
+    });
+    set((state) => ({
+      votingStatus: {
+        ...state.votingStatus,
+        isOpen: !!resp.status,
         updatedAt: new Date(),
         updatedBy: state.currentUser?.username || 'system',
       },

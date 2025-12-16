@@ -19,9 +19,12 @@ import {
 import { toast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Crown, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCandidates, useDeleteCandidate } from '@/hooks/useCandidates';
 
 export default function Candidates() {
-  const { candidates, deleteCandidate, currentUser } = useVotingStore();
+  const { currentUser } = useVotingStore();
+  const { data: candidates = [] } = useCandidates();
+  const deleteCandidate = useDeleteCandidate();
   const [formOpen, setFormOpen] = useState(false);
   const [editCandidate, setEditCandidate] = useState<UTSelection | undefined>();
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -34,11 +37,17 @@ export default function Candidates() {
   };
 
   const handleDelete = () => {
-    if (deleteId) {
-      deleteCandidate(deleteId);
-      toast({ title: 'Candidate deleted successfully' });
-      setDeleteId(null);
-    }
+    if (!deleteId) return;
+
+    deleteCandidate
+      .mutateAsync(deleteId)
+      .then(() => {
+        toast({ title: 'Candidate deleted successfully' });
+        setDeleteId(null);
+      })
+      .catch(() => {
+        toast({ title: 'Error deleting candidate', variant: 'destructive' });
+      });
   };
 
   const handleFormClose = () => {

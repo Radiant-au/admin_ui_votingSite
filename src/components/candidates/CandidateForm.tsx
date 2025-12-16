@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { UTSelection, Category, Gender, CandidateType } from '@/types';
-import { useVotingStore } from '@/store/votingStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -23,6 +22,7 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from '@/hooks/use-toast';
 import { ImagePlus, X } from 'lucide-react';
+import { useCreateCandidate, useUpdateCandidate } from '@/hooks/useCandidates';
 
 const schema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -43,8 +43,9 @@ interface CandidateFormProps {
 }
 
 export function CandidateForm({ open, onClose, candidate }: CandidateFormProps) {
-  const { addCandidate, updateCandidate } = useVotingStore();
   const [additionalImages, setAdditionalImages] = useState<string[]>([]);
+  const createCandidate = useCreateCandidate();
+  const updateCandidate = useUpdateCandidate();
 
   const {
     register,
@@ -87,10 +88,13 @@ export function CandidateForm({ open, onClose, candidate }: CandidateFormProps) 
       const candidateType = getCandidateType(data.gender, data.category);
       
       if (candidate) {
-        updateCandidate(candidate.id, { ...data, candidateType });
+        await updateCandidate.mutateAsync({
+          id: candidate.id,
+          updates: { ...data, candidateType },
+        });
         toast({ title: 'Candidate updated successfully!' });
       } else {
-        addCandidate({
+        await createCandidate.mutateAsync({
           name: data.name,
           gender: data.gender,
           category: data.category,
@@ -131,8 +135,8 @@ export function CandidateForm({ open, onClose, candidate }: CandidateFormProps) 
           {/* Profile Image Preview */}
           <div className="space-y-2">
             <Label className="text-foreground">Profile Image URL</Label>
-            <Input 
-              placeholder="https://example.com/image.jpg"
+            <Input
+              placeholder="https://res.cloudinary.com/..."
               className="bg-secondary/50 border-border/50"
               {...register('profileImg')}
             />
@@ -141,9 +145,9 @@ export function CandidateForm({ open, onClose, candidate }: CandidateFormProps) 
             )}
             {profileImg && (
               <div className="mt-2 relative w-32 h-32 rounded-lg overflow-hidden border-2 border-primary/30">
-                <img 
-                  src={profileImg} 
-                  alt="Preview" 
+                <img
+                  src={profileImg}
+                  alt="Preview"
                   className="w-full h-full object-cover"
                   onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/150')}
                 />

@@ -32,16 +32,23 @@ export default function Login() {
   });
 
   const onSubmit = async (data: FormData) => {
-    const success = login(data.username, data.password);
-    
-    if (success) {
-      toast({ title: 'Welcome back!', description: 'Login successful' });
-      navigate('/dashboard');
-    } else {
-      toast({ 
-        title: 'Login failed', 
+    try {
+      const success = await login(data.username, data.password);
+      if (success) {
+        toast({ title: 'Welcome back!', description: 'Login successful' });
+        navigate('/dashboard');
+        return;
+      }
+      toast({
+        title: 'Login failed',
         description: 'Invalid username or password',
-        variant: 'destructive' 
+        variant: 'destructive',
+      });
+    } catch (error) {
+      toast({
+        title: 'Login failed',
+        description: 'Unable to sign in. Please check server and credentials.',
+        variant: 'destructive',
       });
     }
   };

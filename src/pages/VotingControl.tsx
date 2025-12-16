@@ -2,6 +2,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useVotingStore } from '@/store/votingStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useEffect } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,7 +20,14 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
 export default function VotingControl() {
-  const { votingStatus, toggleVoting, activityLogs } = useVotingStore();
+  const { votingStatus, toggleVoting, activityLogs, startVotingStatusSse } = useVotingStore();
+
+  useEffect(() => {
+    const stop = startVotingStatusSse();
+    return () => {
+      stop();
+    };
+  }, [startVotingStatusSse]);
 
   return (
     <DashboardLayout>

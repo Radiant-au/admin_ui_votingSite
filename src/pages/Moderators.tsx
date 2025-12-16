@@ -24,7 +24,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function Moderators() {
-  const { users, addModerator, currentUser } = useVotingStore();
+  const { addModerator, currentUser } = useVotingStore();
   const [isAdding, setIsAdding] = useState(false);
 
   const {
@@ -36,17 +36,11 @@ export default function Moderators() {
     resolver: zodResolver(schema),
   });
 
-  const moderators = users.filter(u => u.user.role === 'vote_moderator');
+  const moderators: { user: { id: string; role: string }; username: string }[] = [];
 
   const onSubmit = async (data: FormData) => {
     try {
-      // Check if username already exists
-      if (users.some(u => u.username === data.username)) {
-        toast({ title: 'Username already exists', variant: 'destructive' });
-        return;
-      }
-
-      addModerator(data.username, data.password);
+      await addModerator(data.username, data.password);
       toast({ title: 'Moderator added successfully!' });
       reset();
       setIsAdding(false);
