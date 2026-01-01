@@ -9,8 +9,7 @@ const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'vote_moderator'] },
   { to: '/candidates', icon: Users, label: 'Candidates', roles: ['admin', 'vote_moderator'] },
   { to: '/moderators', icon: UserPlus, label: 'Moderators', roles: ['admin'] },
-  { to: '/voting-control', icon: Vote, label: 'Voting Control', roles: ['admin'] },
-  { to: '/connections', icon: Radio, label: 'Connections', roles: ['admin'] },
+  { to: '/voting-control', icon: Vote, label: 'Voting Control', roles: ['admin'] }
 ];
 
 export function Sidebar() {
