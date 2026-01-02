@@ -50,6 +50,22 @@ export function CandidateCard({ candidate, index }: CandidateCardProps) {
         </div>
         
         <div className="p-2 md:p-4 space-y-2 md:space-y-3 border-t border-border/30">
+          {candidate.images && candidate.images.length > 0 && (
+            <div className="flex items-center gap-1.5 md:gap-2">
+              {candidate.images.slice(0, 4).map((img) => (
+                <div 
+                  key={img.id} 
+                  className="w-6 h-6 md:w-8 md:h-8 rounded-full overflow-hidden border-2 border-primary/30 hover:border-primary transition-colors"
+                >
+                  <img 
+                    src={img.imageUrl} 
+                    alt={`${candidate.name} photo`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span className="text-[10px] md:text-sm text-muted-foreground">Votes</span>
             <span className="font-display text-sm md:text-lg font-bold text-primary">{candidate.voteCount.toLocaleString()}</span>
