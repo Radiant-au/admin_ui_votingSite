@@ -6,8 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Candidates from "./pages/Candidates";
-import VotingControl from "./pages/VotingControl";
-import Connections from "./pages/Connections";
+import Control from "./pages/Control";
 import Moderators from "./pages/Moderators";
 import NotFound from "./pages/NotFound";
 import { useVotingStore } from "./store/votingStore";
@@ -32,8 +31,7 @@ const App = () => (
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/candidates" element={<ProtectedRoute><Candidates /></ProtectedRoute>} />
           <Route path="/moderators" element={<ProtectedRoute adminOnly><Moderators /></ProtectedRoute>} />
-          <Route path="/voting-control" element={<ProtectedRoute adminOnly><VotingControl /></ProtectedRoute>} />
-          <Route path="/connections" element={<ProtectedRoute adminOnly><Connections /></ProtectedRoute>} />
+          <Route path="/control" element={<ProtectedRoute adminOnly><Control /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
