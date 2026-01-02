@@ -68,6 +68,10 @@ interface VotingStore {
   startVotingStatusSse: () => () => void;
   toggleVoting: () => Promise<void>;
   
+  // Winner Status
+  winnerStatus: { isRevealed: boolean; updatedAt: Date; updatedBy: string };
+  toggleWinner: () => void;
+  
   // PinCode Votes
   pinCodeVotes: PinCodeVote[];
   getTotalPinCodesVoted: () => number;
@@ -124,6 +128,24 @@ export const useVotingStore = create<VotingStore>((set, get) => ({
     isOpen: true,
     updatedAt: new Date(),
     updatedBy: 'admin',
+  },
+
+  winnerStatus: {
+    isRevealed: false,
+    updatedAt: new Date(),
+    updatedBy: 'admin',
+  },
+
+  toggleWinner: () => {
+    set((state) => ({
+      winnerStatus: {
+        isRevealed: !state.winnerStatus.isRevealed,
+        updatedAt: new Date(),
+        updatedBy: state.currentUser?.username || 'system',
+      },
+    }));
+    const newStatus = get().winnerStatus.isRevealed ? 'revealed' : 'hidden';
+    get().addActivityLog(`Winner ${newStatus}`);
   },
 
   fetchVotingStatus: async () => {

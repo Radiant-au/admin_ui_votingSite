@@ -9,12 +9,10 @@ export default function Dashboard() {
   
   const kingCandidates = getCandidatesByType('king');
   const queenCandidates = getCandidatesByType('queen');
-  const princeCandidates = getCandidatesByType('prince');
-  const princessCandidates = getCandidatesByType('princess');
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 md:space-y-8">
+      <div className="space-y-4 md:space-y-6">
         {/* Header */}
         <div className="animate-fade-in">
           <h1 className="text-xl md:text-3xl font-display golden-text">Dashboard</h1>
@@ -34,8 +32,6 @@ export default function Dashboard() {
         <CategoryTabs
           kingCandidates={kingCandidates}
           queenCandidates={queenCandidates}
-          princeCandidates={princeCandidates}
-          princessCandidates={princessCandidates}
         />
       </div>
     </DashboardLayout>

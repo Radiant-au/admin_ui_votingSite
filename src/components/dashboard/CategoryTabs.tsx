@@ -7,22 +7,16 @@ import { cn } from '@/lib/utils';
 interface CategoryTabsProps {
   kingCandidates: UTSelection[];
   queenCandidates: UTSelection[];
-  princeCandidates: UTSelection[];
-  princessCandidates: UTSelection[];
 }
 
 const tabs: { key: CandidateType; label: string; icon: typeof Crown }[] = [
   { key: 'king', label: 'King', icon: Crown },
   { key: 'queen', label: 'Queen', icon: Crown },
-  { key: 'prince', label: 'Prince', icon: Sparkles },
-  { key: 'princess', label: 'Princess', icon: Sparkles },
 ];
 
 export function CategoryTabs({
   kingCandidates,
   queenCandidates,
-  princeCandidates,
-  princessCandidates,
 }: CategoryTabsProps) {
   const [activeTab, setActiveTab] = useState<CandidateType>('king');
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -33,8 +27,7 @@ export function CategoryTabs({
     switch (type) {
       case 'king': return kingCandidates;
       case 'queen': return queenCandidates;
-      case 'prince': return princeCandidates;
-      case 'princess': return princessCandidates;
+      default: return [];
     }
   };
 
