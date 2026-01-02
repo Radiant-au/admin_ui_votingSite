@@ -125,6 +125,22 @@ export default function Candidates() {
                       <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
                         {candidate.description}
                       </p>
+                      {candidate.images && candidate.images.length > 0 && (
+                        <div className="flex items-center gap-2 mt-3">
+                          {candidate.images.slice(0, 3).map((img) => (
+                            <div 
+                              key={img.id} 
+                              className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/30 hover:border-primary transition-colors"
+                            >
+                              <img 
+                                src={img.imageUrl} 
+                                alt={`${candidate.name} photo`}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Actions */}
