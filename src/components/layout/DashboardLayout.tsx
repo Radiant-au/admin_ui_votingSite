@@ -1,23 +1,24 @@
+// import { ReactNode, useEffect } from 'react';
 import { ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
-import { useVotingStore } from '@/store/votingStore';
+import { useAuthContext } from '@/context/AuthContext';
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { currentUser } = useVotingStore();
+  const { user } = useAuthContext();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!currentUser) {
+    if (!user) {
       navigate('/');
     }
-  }, [currentUser, navigate]);
+  }, [user, navigate]);
 
-  if (!currentUser) return null;
+  if (!user) return null;
 
   return (
     <div className="min-h-screen flex w-full bg-background">

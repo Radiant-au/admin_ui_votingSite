@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiJson, apiPutJson, apiRequest } from '@/lib/apiClient';
-import type { CandidateType, UTSelection } from '@/types';
+import { apiJson, apiPutJson, apiRequest } from '@/api/apiClient';
 
 type BackendSelection = {
   id: number;
@@ -10,7 +9,25 @@ type BackendSelection = {
   major: string;
   description: string;
   category: 'king-queen' | 'prince-princess';
+  images: string[];
 };
+
+export type Category = 'king-queen' | 'prince-princess';
+export type CandidateType = 'king' | 'queen' | 'prince' | 'princess';
+export type UserRole = 'admin' | 'vote_moderator' | 'user';
+export type Gender = 'male' | 'female';
+
+export interface UTSelection {
+  id: string;
+  name: string;
+  gender: Gender;
+  profileImg: string;
+  category: Category;
+  candidateType: CandidateType;
+  major: string;
+  description: string;
+  images: string[];
+}
 
 function computeCandidateType(selection: BackendSelection): CandidateType {
   const gender = (selection.gender || '').toLowerCase();
@@ -30,8 +47,7 @@ function mapBackendSelectionToUi(selection: BackendSelection): UTSelection {
     candidateType: computeCandidateType(selection),
     major: selection.major,
     description: selection.description,
-    images: [],
-    voteCount: 0,
+    images: selection.images || [],
   };
 }
 
@@ -50,7 +66,7 @@ export function useCandidates() {
 export function useCreateCandidate() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (candidate: Omit<UTSelection, 'id' | 'voteCount' | 'images'>) => {
+    mutationFn: async (candidate: Omit<UTSelection, 'id'>) => {
       await apiJson('/selection', {
         name: candidate.name,
         gender: candidate.gender,
@@ -58,6 +74,7 @@ export function useCreateCandidate() {
         description: candidate.description,
         category: candidate.category,
         profileImg: candidate.profileImg,
+        images: candidate.images,
       });
     },
     onSuccess: async () => {
@@ -71,6 +88,7 @@ export function useUpdateCandidate() {
   return useMutation({
     mutationFn: async (params: { id: string; updates: Partial<UTSelection> }) => {
       const { id, updates } = params;
+      console.log(params);
       await apiPutJson(`/selection/${id}`, {
         ...(updates.name != null ? { name: updates.name } : {}),
         ...(updates.gender != null ? { gender: updates.gender } : {}),
@@ -78,6 +96,7 @@ export function useUpdateCandidate() {
         ...(updates.description != null ? { description: updates.description } : {}),
         ...(updates.category != null ? { category: updates.category } : {}),
         ...(updates.profileImg != null ? { profileImg: updates.profileImg } : {}),
+        ...(updates.images != null ? { images: updates.images } : {}),
       });
     },
     onSuccess: async () => {

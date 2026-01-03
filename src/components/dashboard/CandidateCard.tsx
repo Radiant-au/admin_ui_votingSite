@@ -1,19 +1,16 @@
-import { UTSelection } from '@/types';
-import { useVotingStore } from '@/store/votingStore';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Crown, Sparkles } from 'lucide-react';
+import { CandidateWithType } from '@/hooks/useVoteData';
 
 interface CandidateCardProps {
-  candidate: UTSelection;
+  candidate: CandidateWithType;
+  percentage: number;
   index: number;
 }
 
-export function CandidateCard({ candidate, index }: CandidateCardProps) {
-  const { getVotePercentage } = useVotingStore();
-  const percentage = getVotePercentage(candidate.id);
-
+export function CandidateCard({ candidate, percentage, index }: CandidateCardProps) {
   const typeConfig = {
     king: { label: 'King', icon: Crown, color: 'bg-primary/20 text-primary border-primary/30' },
     queen: { label: 'Queen', icon: Crown, color: 'bg-primary/20 text-primary border-primary/30' },
@@ -33,7 +30,7 @@ export function CandidateCard({ candidate, index }: CandidateCardProps) {
         <div className="relative aspect-[3/4] overflow-hidden">
           <img 
             src={candidate.profileImg} 
-            alt={candidate.name}
+            alt={candidate.selectionName}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
@@ -44,31 +41,18 @@ export function CandidateCard({ candidate, index }: CandidateCardProps) {
           </Badge>
           
           <div className="absolute bottom-0 left-0 right-0 p-2 md:p-4">
-            <h3 className="font-display text-xs md:text-lg font-semibold text-foreground truncate">{candidate.name}</h3>
-            <p className="text-[10px] md:text-sm text-muted-foreground truncate">{candidate.major}</p>
+            <h3 className="font-display text-xs md:text-lg font-semibold text-foreground truncate">
+              {candidate.selectionName}
+            </h3>
           </div>
         </div>
         
         <div className="p-2 md:p-4 space-y-2 md:space-y-3 border-t border-border/30">
-          {candidate.images && candidate.images.length > 0 && (
-            <div className="flex items-center gap-1.5 md:gap-2">
-              {candidate.images.slice(0, 4).map((img) => (
-                <div 
-                  key={img.id} 
-                  className="w-6 h-6 md:w-8 md:h-8 rounded-full overflow-hidden border-2 border-primary/30 hover:border-primary transition-colors"
-                >
-                  <img 
-                    src={img.imageUrl} 
-                    alt={`${candidate.name} photo`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
           <div className="flex items-center justify-between">
             <span className="text-[10px] md:text-sm text-muted-foreground">Votes</span>
-            <span className="font-display text-sm md:text-lg font-bold text-primary">{candidate.voteCount.toLocaleString()}</span>
+            <span className="font-display text-sm md:text-lg font-bold text-primary">
+              {candidate.voteCount.toLocaleString()}
+            </span>
           </div>
           <div className="space-y-1">
             <div className="flex justify-between text-[10px] md:text-xs">

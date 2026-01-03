@@ -1,42 +1,44 @@
-import { useVotingStore } from '@/store/votingStore';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Vote, KeyRound, TrendingUp } from 'lucide-react';
+import { Users, Vote, KeyRound, TrendingUp, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useVoteData } from '@/hooks/useVoteData';
+import { useVotingStatus, useWinnerStatus } from '@/hooks/useStatus';
 
 export function StatsCards() {
-  const { candidates, getTotalVotes, getTotalPinCodesVoted, votingStatus } = useVotingStore();
-  
-  const totalVotes = getTotalVotes();
-  const totalPinCodes = getTotalPinCodesVoted();
+  const { totalVoters, isLoading: votesLoading } = useVoteData();
+  const { data: votingStatusData, isLoading: votingLoading } = useVotingStatus();
+  const { data: winnerStatusData, isLoading: winnerLoading } = useWinnerStatus();
+
+  console.log(totalVoters)
 
   const stats = [
     {
-      label: 'Total Votes',
-      value: totalVotes.toLocaleString(),
+      label: 'Total PinCodes',
+      value: votesLoading ? '...' : totalVoters.totalCodes,
       icon: Vote,
       color: 'text-primary',
       bgColor: 'bg-primary/10',
     },
     {
-      label: 'Total Candidates',
-      value: candidates.length,
-      icon: Users,
-      color: 'text-gold',
-      bgColor: 'bg-gold/10',
+      label: 'Winner Status',
+      value: winnerLoading ? '...' : (winnerStatusData?.status || 'CLOSED'),
+      icon: Trophy,
+      color: winnerStatusData?.status === 'OPEN' ? 'text-success' : 'text-destructive',
+      bgColor: winnerStatusData?.status === 'OPEN' ? 'bg-success/10' : 'bg-destructive/10',
     },
     {
       label: 'PinCodes Voted',
-      value: totalPinCodes,
+      value: votesLoading ? '...' : totalVoters.votedCodes,
       icon: KeyRound,
       color: 'text-accent',
       bgColor: 'bg-accent/10',
     },
     {
       label: 'Voting Status',
-      value: votingStatus.isOpen ? 'OPEN' : 'CLOSED',
+      value: votingLoading ? '...' : (votingStatusData?.status || 'CLOSED'),
       icon: TrendingUp,
-      color: votingStatus.isOpen ? 'text-success' : 'text-destructive',
-      bgColor: votingStatus.isOpen ? 'bg-success/10' : 'bg-destructive/10',
+      color: votingStatusData?.status === 'OPEN' ? 'text-success' : 'text-destructive',
+      bgColor: votingStatusData?.status === 'OPEN' ? 'bg-success/10' : 'bg-destructive/10',
     },
   ];
 
@@ -58,7 +60,7 @@ export function StatsCards() {
                 <p className="text-xs md:text-sm text-muted-foreground">{stat.label}</p>
                 <p className={cn(
                   "text-xl md:text-2xl font-bold font-display",
-                  stat.label === 'Voting Status' ? stat.color : 'text-foreground'
+                  (stat.label === 'Voting Status' || stat.label === 'Winner Status') ? stat.color : 'text-foreground'
                 )}>
                   {stat.value}
                 </p>

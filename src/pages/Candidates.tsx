@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { CandidateForm } from '@/components/candidates/CandidateForm';
-import { useVotingStore } from '@/store/votingStore';
-import { UTSelection } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,17 +17,18 @@ import {
 import { toast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Crown, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useCandidates, useDeleteCandidate } from '@/hooks/useCandidates';
+import { useCandidates, useDeleteCandidate, UTSelection } from '@/hooks/useCandidates';
+import { useAuthContext } from '@/context/AuthContext';
 
 export default function Candidates() {
-  const { currentUser } = useVotingStore();
+  const { user } = useAuthContext();
   const { data: candidates = [] } = useCandidates();
   const deleteCandidate = useDeleteCandidate();
   const [formOpen, setFormOpen] = useState(false);
   const [editCandidate, setEditCandidate] = useState<UTSelection | undefined>();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const isAdmin = currentUser?.role === 'admin';
+  const isAdmin = user?.role === 'admin';
 
   const handleEdit = (candidate: UTSelection) => {
     setEditCandidate(candidate);
@@ -117,10 +116,10 @@ export default function Candidates() {
                             <span className="capitalize">• {candidate.gender}</span>
                           </div>
                         </div>
-                        <div className="text-right">
+                        {/* <div className="text-right">
                           <p className="text-2xl font-bold text-primary">{candidate.voteCount}</p>
                           <p className="text-xs text-muted-foreground">votes</p>
-                        </div>
+                        </div> */}
                       </div>
                       <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
                         {candidate.description}
@@ -131,11 +130,11 @@ export default function Candidates() {
                         <div className="flex gap-2 mt-3">
                           {candidate.images.slice(0, 3).map((img) => (
                             <div
-                              key={img.id}
+                              key={img}
                               className="w-10 h-10 rounded-full overflow-hidden border-2 border-border"
                             >
                               <img
-                                src={img.imageUrl}
+                                src={img}
                                 alt={`${candidate.name} photo`}
                                 className="w-full h-full object-cover"
                               />

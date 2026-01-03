@@ -1,35 +1,22 @@
 import { useState, useRef } from 'react';
-import { UTSelection, CandidateType } from '@/types';
 import { CandidateCard } from './CandidateCard';
 import { Crown, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useVoteData } from '@/hooks/useVoteData';
 
-interface CategoryTabsProps {
-  kingCandidates: UTSelection[];
-  queenCandidates: UTSelection[];
-}
+type CandidateType = 'king' | 'queen';
 
 const tabs: { key: CandidateType; label: string; icon: typeof Crown }[] = [
   { key: 'king', label: 'King', icon: Crown },
   { key: 'queen', label: 'Queen', icon: Crown },
 ];
 
-export function CategoryTabs({
-  kingCandidates,
-  queenCandidates,
-}: CategoryTabsProps) {
+export function CategoryTabs() {
+  const { getCandidatesByType, getVotePercentage, isLoading } = useVoteData();
   const [activeTab, setActiveTab] = useState<CandidateType>('king');
   const tabsContainerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
-
-  const getCandidates = (type: CandidateType): UTSelection[] => {
-    switch (type) {
-      case 'king': return kingCandidates;
-      case 'queen': return queenCandidates;
-      default: return [];
-    }
-  };
 
   const currentIndex = tabs.findIndex(t => t.key === activeTab);
 
@@ -62,7 +49,22 @@ export function CategoryTabs({
     }
   };
 
-  const candidates = getCandidates(activeTab);
+  const candidates = getCandidatesByType(activeTab);
+
+  if (isLoading) {
+    return (
+      <section className="space-y-4 animate-slide-up">
+        <div className="flex items-center justify-between">
+          <div className="h-7 w-32 bg-muted animate-pulse rounded" />
+        </div>
+        <div className="grid grid-cols-2 gap-2 md:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="aspect-[3/4] bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="space-y-4 animate-slide-up">
@@ -84,7 +86,7 @@ export function CategoryTabs({
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
-          const count = getCandidates(tab.key).length;
+          const count = getCandidatesByType(tab.key).length;
           
           return (
             <button
@@ -144,8 +146,9 @@ export function CategoryTabs({
         <div className="grid grid-cols-2 gap-2 md:gap-4 px-0 md:px-12">
           {candidates.map((candidate, index) => (
             <CandidateCard 
-              key={candidate.id} 
-              candidate={candidate} 
+              key={candidate.selectionId} 
+              candidate={candidate}
+              percentage={getVotePercentage(candidate.selectionId)}
               index={index}
             />
           ))}

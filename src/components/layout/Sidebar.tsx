@@ -2,23 +2,23 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, Vote, Radio, LogOut, Menu, X, Crown, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useVotingStore } from '@/store/votingStore';
 import { cn } from '@/lib/utils';
+import { useAuthContext } from '@/context/AuthContext';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'vote_moderator'] },
-  { to: '/candidates', icon: Users, label: 'Candidates', roles: ['admin', 'vote_moderator'] },
+  { to: '/candidates', icon: Users, label: 'Candidates', roles: ['admin'] },
   { to: '/moderators', icon: UserPlus, label: 'Moderators', roles: ['admin'] },
   { to: '/control', icon: Vote, label: 'Control', roles: ['admin'] }
 ];
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { currentUser, logout } = useVotingStore();
+  const { user, logout } = useAuthContext();
   const navigate = useNavigate();
 
   const handleLogout = () => { logout(); navigate('/'); };
-  const filteredNav = navItems.filter(item => currentUser && item.roles.includes(currentUser.role));
+  const filteredNav = navItems.filter(item => user && item.roles.includes(user.role));
 
   return (
     <>
@@ -46,11 +46,11 @@ export function Sidebar() {
         <div className="px-4 py-4 border-b border-sidebar-border">
           <div className="flex items-center gap-3 p-3 rounded-lg bg-sidebar-accent border border-primary/20">
             <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center text-primary-foreground font-semibold">
-              {currentUser?.username.charAt(0).toUpperCase()}
+              {user?.username.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sidebar-foreground font-medium truncate">{currentUser?.username}</p>
-              <p className="text-xs text-muted-foreground capitalize">{currentUser?.role.replace('_', ' ')}</p>
+              <p className="text-sidebar-foreground font-medium truncate">{user?.username}</p>
+              <p className="text-xs text-muted-foreground capitalize">{user?.role}</p>
             </div>
           </div>
         </div>

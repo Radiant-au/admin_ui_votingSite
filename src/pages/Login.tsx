@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useVotingStore } from '@/store/votingStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { Crown, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { useAuthContext } from '@/context/AuthContext';
 
 const schema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -20,8 +20,15 @@ type FormData = z.infer<typeof schema>;
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useVotingStore();
+  const { login, isAuthenticated } = useAuthContext();
   const navigate = useNavigate();
+
+   // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const {
     register,

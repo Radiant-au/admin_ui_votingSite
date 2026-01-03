@@ -1,48 +1,49 @@
 import { useState } from 'react';
-import { useVotingStore } from '@/store/votingStore';
+import { useVoteData } from '@/hooks/useVoteData';
 import { 
   PieChart,
   Pie,
   Cell,
   ResponsiveContainer,
-  Tooltip,
   Legend
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Crown, Sparkles } from 'lucide-react';
 
-// Distinct vibrant colors for each slice
 const CHART_COLORS = [
-  '#FFD700', // Gold
-  '#FF6B6B', // Coral Red
-  '#4ECDC4', // Teal
-  '#9B59B6', // Purple
-  '#3498DB', // Blue
+  '#FFD700', '#FF6B6B', '#4ECDC4', '#9B59B6', '#3498DB',
 ];
 
 export function VoteCharts() {
-  const { getCandidatesByType } = useVotingStore();
+  const { getCandidatesByType, isLoading } = useVoteData();
   const [activeIndex, setActiveIndex] = useState<{ [key: string]: number | null }>({});
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 gap-2 md:gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="golden-card animate-pulse">
+            <CardContent className="h-64" />
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   const createPieData = (type: 'king' | 'queen' | 'prince' | 'princess') => {
     return getCandidatesByType(type).map((c, i) => ({
-      name: c.name,
-      shortName: c.name.split(' ')[0],
+      name: c.selectionName,
+      shortName: c.selectionName.split(' ')[0],
       value: c.voteCount,
       fill: CHART_COLORS[i % CHART_COLORS.length],
     }));
   };
 
-  const kingData = createPieData('king');
-  const queenData = createPieData('queen');
-  const princeData = createPieData('prince');
-  const princessData = createPieData('princess');
-
   const chartConfig = [
-    { key: 'king', title: 'King', data: kingData, icon: Crown },
-    { key: 'queen', title: 'Queen', data: queenData, icon: Crown },
-    { key: 'prince', title: 'Prince', data: princeData, icon: Sparkles },
-    { key: 'princess', title: 'Princess', data: princessData, icon: Sparkles },
+    { key: 'king', title: 'King', data: createPieData('king'), icon: Crown },
+    { key: 'queen', title: 'Queen', data: createPieData('queen'), icon: Crown },
+    // { key: 'prince', title: 'Prince', data: createPieData('prince'), icon: Sparkles },
+    // { key: 'princess', title: 'Princess', data: createPieData('princess'), icon: Sparkles },
   ];
 
   const handlePieClick = (chartKey: string, index: number) => {
@@ -71,7 +72,6 @@ export function VoteCharts() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-2 md:p-4 pt-0">
-              {/* Selected name display */}
               <div className="h-6 md:h-8 flex items-center justify-center">
                 {selectedEntry && (
                   <div className="px-2 py-0.5 rounded-full bg-primary/20 border border-primary/30 animate-fade-in">
@@ -113,17 +113,6 @@ export function VoteCharts() {
                         />
                       ))}
                     </Pie>
-                    {/* <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'hsl(30, 15%, 10%)',
-                        border: '1px solid hsl(45, 90%, 55%, 0.3)',
-                        borderRadius: '0.5rem',
-                        color: 'hsl(45, 30%, 96%)',
-                        fontSize: '10px',
-                        padding: '4px 8px'
-                      }}
-                      formatter={(value: number, name: string) => [`${value} votes`, name]}
-                    /> */}
                     <Legend 
                       wrapperStyle={{ fontSize: '8px' }}
                       iconSize={6}

@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { useVotingStore } from '@/store/votingStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { UserPlus, Users, Shield } from 'lucide-react';
+import { useModerators } from '@/hooks/useModerator';
 
 const schema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -24,40 +24,46 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function Moderators() {
-  const { addModerator, currentUser } = useVotingStore();
-  const [isAdding, setIsAdding] = useState(false);
+  const { moderators, isLoading, addModerator, isAdding } = useModerators();
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
-  const moderators: { user: { id: string; role: string }; username: string }[] = [];
-
   const onSubmit = async (data: FormData) => {
     try {
-      await addModerator(data.username, data.password);
+      await addModerator({
+        username: data.username,
+        password: data.password,
+      });
       toast({ title: 'Moderator added successfully!' });
       reset();
-      setIsAdding(false);
-    } catch (error) {
-      toast({ title: 'Error adding moderator', variant: 'destructive' });
+      setIsFormOpen(false);
+    } catch (error: any) {
+      toast({ 
+        title: 'Error adding moderator', 
+        description: error.message || 'Something went wrong',
+        variant: 'destructive' 
+      });
     }
   };
 
-  if (currentUser?.role !== 'admin') {
+  if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-[60vh]">
-          <Card className="golden-card p-8 text-center">
-            <Shield className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h2 className="text-xl font-display text-foreground">Access Denied</h2>
-            <p className="text-muted-foreground mt-2">Only admins can manage moderators.</p>
-          </Card>
+        <div className="space-y-8">
+          <div className="animate-pulse space-y-2">
+            <div className="h-8 w-48 bg-muted rounded" />
+            <div className="h-4 w-64 bg-muted rounded" />
+          </div>
+          <div className="h-32 bg-muted animate-pulse rounded-lg" />
+          <div className="h-64 bg-muted animate-pulse rounded-lg" />
         </div>
       </DashboardLayout>
     );
@@ -73,7 +79,7 @@ export default function Moderators() {
             <p className="text-muted-foreground mt-1">Manage vote moderator accounts</p>
           </div>
           <Button 
-            onClick={() => setIsAdding(true)}
+            onClick={() => setIsFormOpen(true)}
             className="gradient-primary text-primary-foreground"
           >
             <UserPlus className="h-4 w-4 mr-2" />
@@ -97,7 +103,7 @@ export default function Moderators() {
         </Card>
 
         {/* Add Moderator Form */}
-        {isAdding && (
+        {isFormOpen && (
           <Card className="golden-card animate-scale-in">
             <CardHeader>
               <CardTitle className="font-display golden-text flex items-center gap-2">
@@ -151,17 +157,17 @@ export default function Moderators() {
                   <Button 
                     type="button" 
                     variant="outline" 
-                    onClick={() => { reset(); setIsAdding(false); }}
+                    onClick={() => { reset(); setIsFormOpen(false); }}
                     className="border-border/50"
                   >
                     Cancel
                   </Button>
                   <Button 
                     type="submit" 
-                    disabled={isSubmitting}
+                    disabled={isAdding}
                     className="gradient-primary text-primary-foreground"
                   >
-                    {isSubmitting ? 'Adding...' : 'Add Moderator'}
+                    {isAdding ? 'Adding...' : 'Add Moderator'}
                   </Button>
                 </div>
               </form>
@@ -184,7 +190,7 @@ export default function Moderators() {
               <div className="space-y-3">
                 {moderators.map((mod) => (
                   <div 
-                    key={mod.user.id}
+                    key={mod.id}
                     className="flex items-center justify-between p-4 rounded-lg bg-secondary/30 border border-border/30"
                   >
                     <div className="flex items-center gap-3">
@@ -193,13 +199,15 @@ export default function Moderators() {
                           {mod.username.charAt(0)}
                         </span>
                       </div>
-                      <div>
+                      {/* <div>
                         <p className="font-medium text-foreground">{mod.username}</p>
-                        <p className="text-sm text-muted-foreground">ID: {mod.user.id}</p>
-                      </div>
+                        <p className="text-sm text-muted-foreground">
+                          Added: {new Date(mod.createdAt).toLocaleDateString()}
+                        </p>
+                      </div> */}
                     </div>
                     <Badge className="bg-accent/20 text-accent border-accent/30">
-                      Vote Moderator
+                      {mod.role.replace('_', ' ').toUpperCase()}
                     </Badge>
                   </div>
                 ))}

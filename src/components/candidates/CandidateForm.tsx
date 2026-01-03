@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { UTSelection, Category, Gender, CandidateType } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,7 +21,7 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from '@/hooks/use-toast';
 import { ImagePlus, X } from 'lucide-react';
-import { useCreateCandidate, useUpdateCandidate } from '@/hooks/useCandidates';
+import { CandidateType, Category, Gender, useCreateCandidate, useUpdateCandidate, UTSelection } from '@/hooks/useCandidates';
 
 const schema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -56,20 +55,41 @@ export function CandidateForm({ open, onClose, candidate }: CandidateFormProps) 
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: candidate ? {
-      name: candidate.name,
-      gender: candidate.gender,
-      category: candidate.category,
-      candidateType: candidate.candidateType,
-      major: candidate.major,
-      description: candidate.description,
-      profileImg: candidate.profileImg,
-    } : {
+    defaultValues: {
       gender: 'male',
       category: 'king-queen',
       candidateType: 'king',
     },
   });
+
+  // Initialize form with candidate data when editing
+  useEffect(() => {
+    if (candidate && open) {
+      reset({
+        name: candidate.name,
+        gender: candidate.gender,
+        category: candidate.category,
+        candidateType: candidate.candidateType,
+        major: candidate.major,
+        description: candidate.description,
+        profileImg: candidate.profileImg,
+      });
+      // Initialize additional images
+      setAdditionalImages(candidate.images || []);
+    } else if (!candidate && open) {
+      // Reset to defaults when creating new
+      reset({
+        gender: 'male',
+        category: 'king-queen',
+        candidateType: 'king',
+        name: '',
+        major: '',
+        description: '',
+        profileImg: '',
+      });
+      setAdditionalImages([]);
+    }
+  }, [candidate, open, reset]);
 
   const profileImg = watch('profileImg');
   const watchGender = watch('gender');
@@ -86,11 +106,17 @@ export function CandidateForm({ open, onClose, candidate }: CandidateFormProps) 
   const onSubmit = async (data: FormData) => {
     try {
       const candidateType = getCandidateType(data.gender, data.category);
+      // Filter out empty image URLs
+      const validImages = additionalImages.filter(img => img.trim() !== '');
       
       if (candidate) {
         await updateCandidate.mutateAsync({
           id: candidate.id,
-          updates: { ...data, candidateType },
+          updates: { 
+            ...data, 
+            candidateType,
+            images: validImages,
+          },
         });
         toast({ title: 'Candidate updated successfully!' });
       } else {
@@ -102,14 +128,20 @@ export function CandidateForm({ open, onClose, candidate }: CandidateFormProps) 
           major: data.major,
           description: data.description,
           profileImg: data.profileImg,
+          images: validImages,
         });
         toast({ title: 'Candidate added successfully!' });
       }
-      reset();
-      onClose();
+      handleClose();
     } catch (error) {
       toast({ title: 'Error saving candidate', variant: 'destructive' });
     }
+  };
+
+  const handleClose = () => {
+    reset();
+    setAdditionalImages([]);
+    onClose();
   };
 
   const addImageUrl = () => {
@@ -123,7 +155,7 @@ export function CandidateForm({ open, onClose, candidate }: CandidateFormProps) 
   };
 
   return (
-    <Dialog open={open} onOpenChange={() => { reset(); onClose(); }}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto golden-card border-primary/20">
         <DialogHeader>
           <DialogTitle className="text-xl font-display golden-text">
@@ -173,7 +205,7 @@ export function CandidateForm({ open, onClose, candidate }: CandidateFormProps) 
             <div className="space-y-2">
               <Label className="text-foreground">Gender</Label>
               <Select 
-                defaultValue={candidate?.gender || 'male'}
+                value={watchGender}
                 onValueChange={(value: Gender) => setValue('gender', value)}
               >
                 <SelectTrigger className="bg-secondary/50 border-border/50">
@@ -189,7 +221,7 @@ export function CandidateForm({ open, onClose, candidate }: CandidateFormProps) 
             <div className="space-y-2">
               <Label className="text-foreground">Category</Label>
               <Select 
-                defaultValue={candidate?.category || 'king-queen'}
+                value={watchCategory}
                 onValueChange={(value: Category) => setValue('category', value)}
               >
                 <SelectTrigger className="bg-secondary/50 border-border/50">
@@ -242,7 +274,7 @@ export function CandidateForm({ open, onClose, candidate }: CandidateFormProps) 
           {/* Additional Images */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-foreground">Additional Images (Optional)</Label>
+              <Label className="text-foreground">Additional Images (Max 3)</Label>
               <Button 
                 type="button"
                 variant="outline" 
@@ -287,7 +319,7 @@ export function CandidateForm({ open, onClose, candidate }: CandidateFormProps) 
             <Button 
               type="button" 
               variant="outline" 
-              onClick={() => { reset(); onClose(); }}
+              onClick={handleClose}
               className="flex-1 border-border/50"
             >
               Cancel

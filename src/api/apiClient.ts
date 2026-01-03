@@ -13,12 +13,12 @@ export class ApiError extends Error {
   }
 }
 
+export const getToken = () => localStorage.getItem("token");
+export const setToken = (token: string) => localStorage.setItem("token", token);
+export const clearToken = () => localStorage.removeItem("token");
+
 export function getApiBaseUrl() {
   return (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:5000/api';
-}
-
-function getAuthToken() {
-  return localStorage.getItem('admin_token');
 }
 
 async function parseJsonSafe(res: Response) {
@@ -41,7 +41,7 @@ export async function apiRequest<T>(
     ...(headers || {}),
   };
 
-  const token = getAuthToken();
+  const token = getToken();
   if (auth && token) {
     (finalHeaders as any).Authorization = `Bearer ${token}`;
   }
@@ -50,6 +50,13 @@ export async function apiRequest<T>(
     ...rest,
     headers: finalHeaders,
   });
+
+
+  if (res.status === 401) {
+    clearToken();
+    window.location.href = "/";
+    return Promise.reject("Unauthorized");
+  }
 
   if (!res.ok) {
     const payload = await parseJsonSafe(res);

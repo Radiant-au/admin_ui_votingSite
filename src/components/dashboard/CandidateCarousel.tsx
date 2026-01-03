@@ -1,4 +1,3 @@
-import { UTSelection, CandidateType } from '@/types';
 import { CandidateCard } from './CandidateCard';
 import {
   Carousel,
@@ -8,9 +7,11 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Crown, Sparkles } from 'lucide-react';
+import { CandidateWithType, useVoteData } from '@/hooks/useVoteData';
+
+type CandidateType = 'king' | 'queen' | 'prince' | 'princess';
 
 interface CandidateCarouselProps {
-  candidates: UTSelection[];
   title: string;
   type: CandidateType;
 }
@@ -22,14 +23,34 @@ const typeConfig = {
   princess: { icon: Sparkles, color: 'text-accent' },
 };
 
-export function CandidateCarousel({ candidates, title, type }: CandidateCarouselProps) {
+export function CandidateCarousel({ title, type }: CandidateCarouselProps) {
+  const { getCandidatesByType, getVotePercentage, isLoading } = useVoteData();
+  
   const config = typeConfig[type];
   const Icon = config.icon;
 
+  const candidates = getCandidatesByType(type);
+
   // Group candidates into pairs for 2-column layout
-  const candidatePairs: UTSelection[][] = [];
+  const candidatePairs: CandidateWithType[][] = [];
   for (let i = 0; i < candidates.length; i += 2) {
     candidatePairs.push(candidates.slice(i, i + 2));
+  }
+
+  if (isLoading) {
+    return (
+      <section className="space-y-4 animate-slide-up">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 bg-muted animate-pulse rounded-lg" />
+          <div className="h-7 w-32 bg-muted animate-pulse rounded" />
+        </div>
+        <div className="grid grid-cols-2 gap-2 md:gap-4">
+          {[1, 2].map((i) => (
+            <div key={i} className="aspect-[3/4] bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -55,8 +76,9 @@ export function CandidateCarousel({ candidates, title, type }: CandidateCarousel
               <div className="grid grid-cols-2 gap-2 md:gap-4">
                 {pair.map((candidate, index) => (
                   <CandidateCard 
-                    key={candidate.id} 
-                    candidate={candidate} 
+                    key={candidate.selectionId} 
+                    candidate={candidate}
+                    percentage={getVotePercentage(candidate.selectionId)}
                     index={pairIndex * 2 + index} 
                   />
                 ))}
