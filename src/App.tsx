@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Candidates from "./pages/Candidates";
 import Control from "./pages/Control";
 import Moderators from "./pages/Moderators";
+import Scoring from "./pages/Scoring";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/candidates" element={<ProtectedRoute adminOnly><Candidates /></ProtectedRoute>} />
+          <Route path="/scoring" element={<ProtectedRoute adminOnly><Scoring /></ProtectedRoute>} />
           <Route path="/moderators" element={<ProtectedRoute adminOnly><Moderators /></ProtectedRoute>} />
           <Route path="/control" element={<ProtectedRoute adminOnly><Control /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
