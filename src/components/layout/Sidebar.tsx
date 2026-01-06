@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, Vote, Radio, LogOut, Menu, X, Crown, UserPlus } from 'lucide-react';
+import { LayoutDashboard, Users, Vote, LogOut, Menu, X, Crown, UserPlus, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuthContext } from '@/context/AuthContext';
@@ -8,6 +8,7 @@ import { useAuthContext } from '@/context/AuthContext';
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'vote_moderator'] },
   { to: '/candidates', icon: Users, label: 'Candidates', roles: ['admin'] },
+  { to: '/scoring', icon: ClipboardList, label: 'Scoring', roles: ['admin'] },
   { to: '/moderators', icon: UserPlus, label: 'Moderators', roles: ['admin'] },
   { to: '/control', icon: Vote, label: 'Control', roles: ['admin'] }
 ];
