@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Crown, Trophy } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { CandidateScore } from '@/hooks/useDashboardScores';
 
 const CHART_COLORS = [
@@ -35,7 +35,7 @@ export function FinalScoreCharts({
       .map((c, index) => ({
         name: c.name,
         shortName: c.name.split(' ')[0],
-        value: c.finalScore,
+        value: Number(c.finalScore), // Convert to number in case backend sends string
         fill: CHART_COLORS[index % CHART_COLORS.length],
       }));
   };
@@ -119,6 +119,22 @@ export function FinalScoreCharts({
                           />
                         ))}
                       </Pie>
+                      <Tooltip
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-lg">
+                                <p className="text-sm font-medium">{data.name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  Final Score: <span className="text-primary font-bold">{data.value.toFixed(2)}</span>
+                                </p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
                       <Legend 
                         wrapperStyle={{ fontSize: '8px' }}
                         iconSize={6}
