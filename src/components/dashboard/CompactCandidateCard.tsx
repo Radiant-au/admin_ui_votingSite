@@ -50,11 +50,11 @@ export function CompactCandidateCard({ candidate, type, index }: CompactCandidat
               </div>
               <div className="flex items-center gap-0.5 text-[9px] md:text-[10px] text-muted-foreground">
                 <GraduationCap className="h-2.5 w-2.5 text-green-400" />
-                <span>{candidate.teacherScore > 0 ? candidate.teacherScore.toFixed(1) : '--'}</span>
+                <span>{candidate.teacherScore > 0 ? Number(candidate.teacherScore).toFixed(2) : '--'}</span>
               </div>
               <div className="flex items-center gap-0.5 text-[9px] md:text-[10px] text-muted-foreground">
                 <UserCheck className="h-2.5 w-2.5 text-purple-400" />
-                <span>{candidate.committeeScore > 0 ? candidate.committeeScore.toFixed(1) : '--'}</span>
+                <span>{candidate.committeeScore > 0 ? Number(candidate.committeeScore).toFixed(2) : '--'}</span>
               </div>
             </div>
           </div>
@@ -64,7 +64,7 @@ export function CompactCandidateCard({ candidate, type, index }: CompactCandidat
             {candidate.hasScores ? (
               <div className="px-2 py-1 rounded-lg bg-primary/10 border border-primary/20">
                 <span className="font-display text-sm md:text-base font-bold text-primary">
-                  {candidate.finalScore.toFixed(1)}
+                  {Number(candidate.finalScore).toFixed(2)}
                 </span>
               </div>
             ) : (
