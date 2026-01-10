@@ -4,14 +4,14 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { CandidateScore } from '@/hooks/useDashboardScores';
 
 const COLORS = [
-  'hsl(var(--primary))',
-  'hsl(var(--accent))',
-  'hsl(45, 90%, 55%)',
-  'hsl(200, 80%, 50%)',
-  'hsl(280, 70%, 60%)',
-  'hsl(160, 60%, 45%)',
-  'hsl(10, 75%, 55%)',
-  'hsl(320, 65%, 55%)',
+  'hsl(45, 90%, 55%)',   // primary (golden)
+  'hsl(35, 85%, 45%)',   // accent
+  'hsl(200, 80%, 50%)',  // blue
+  'hsl(280, 70%, 60%)',  // purple
+  'hsl(160, 60%, 45%)',  // teal
+  'hsl(10, 75%, 55%)',   // red-orange
+  'hsl(320, 65%, 55%)',  // pink
+  'hsl(200, 80%, 60%)',  // light blue
 ];
 
 interface FinalScoreChartsProps {
