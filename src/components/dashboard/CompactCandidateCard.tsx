@@ -22,39 +22,39 @@ export function CompactCandidateCard({ candidate, type, index }: CompactCandidat
       className="golden-card overflow-hidden group hover:border-primary/40 transition-all duration-300 animate-scale-in"
       style={{ animationDelay: `${index * 0.05}s` }}
     >
-      <CardContent className="p-2 md:p-3">
-        <div className="flex items-center gap-2 md:gap-3">
+      <CardContent className="p-3 md:p-4">
+        <div className="flex items-center gap-3 md:gap-4">
           {/* Profile Image */}
           <div className="relative flex-shrink-0">
             <img 
               src={candidate.profileImg} 
               alt={candidate.name}
-              className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border-2 border-primary/30"
+              className="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover border-2 border-primary/30"
             />
-            <Badge className={`absolute -bottom-1 -right-1 ${config.color} border text-[8px] px-1 py-0`}>
-              <Crown className="h-2 w-2" />
+            <Badge className={`absolute -bottom-1 -right-1 ${config.color} border text-[10px] px-1.5 py-0.5`}>
+              <Crown className="h-2.5 w-2.5" />
             </Badge>
           </div>
 
           {/* Info */}
-          <div className="flex-1 min-w-0 space-y-1">
-            <h3 className="font-display text-xs md:text-sm font-semibold text-foreground truncate">
+          <div className="flex-1 min-w-0 space-y-1.5">
+            <h3 className="font-display text-sm md:text-base font-semibold text-foreground truncate">
               {candidate.name}
             </h3>
             
             {/* Stats Row */}
-            <div className="flex flex-wrap gap-1 md:gap-2">
-              <div className="flex items-center gap-0.5 text-[9px] md:text-[10px] text-muted-foreground">
-                <Users className="h-2.5 w-2.5 text-blue-400" />
-                <span>{candidate.studentVotes}</span>
+            <div className="flex flex-wrap gap-2 md:gap-3">
+              <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
+                <Users className="h-3.5 w-3.5 md:h-4 md:w-4 text-blue-400" />
+                <span className="font-medium">{candidate.studentVotes}</span>
               </div>
-              <div className="flex items-center gap-0.5 text-[9px] md:text-[10px] text-muted-foreground">
-                <GraduationCap className="h-2.5 w-2.5 text-green-400" />
-                <span>{candidate.teacherScore > 0 ? candidate.teacherScore.toFixed(2) : '--'}</span>
+              <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
+                <GraduationCap className="h-3.5 w-3.5 md:h-4 md:w-4 text-green-400" />
+                <span className="font-medium">{candidate.teacherScore > 0 ? candidate.teacherScore.toFixed(1) : '--'}</span>
               </div>
-              <div className="flex items-center gap-0.5 text-[9px] md:text-[10px] text-muted-foreground">
-                <UserCheck className="h-2.5 w-2.5 text-purple-400" />
-                <span>{candidate.committeeScore > 0 ? candidate.committeeScore.toFixed(2) : '--'}</span>
+              <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
+                <UserCheck className="h-3.5 w-3.5 md:h-4 md:w-4 text-purple-400" />
+                <span className="font-medium">{candidate.committeeScore > 0 ? candidate.committeeScore.toFixed(1) : '--'}</span>
               </div>
             </div>
           </div>
@@ -62,14 +62,14 @@ export function CompactCandidateCard({ candidate, type, index }: CompactCandidat
           {/* Final Score */}
           <div className="flex-shrink-0 text-right">
             {candidate.hasScores ? (
-              <div className="px-2 py-1 rounded-lg bg-primary/10 border border-primary/20">
-                <span className="font-display text-sm md:text-base font-bold text-primary">
-                  {candidate.finalScore.toFixed(2)}
+              <div className="px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20">
+                <span className="font-display text-base md:text-lg font-bold text-primary">
+                  {candidate.finalScore.toFixed(1)}
                 </span>
               </div>
             ) : (
-              <div className="px-2 py-1 rounded-lg bg-muted/50">
-                <span className="text-[10px] md:text-xs text-muted-foreground">--</span>
+              <div className="px-3 py-1.5 rounded-lg bg-muted/50">
+                <span className="text-sm md:text-base text-muted-foreground">--</span>
               </div>
             )}
           </div>

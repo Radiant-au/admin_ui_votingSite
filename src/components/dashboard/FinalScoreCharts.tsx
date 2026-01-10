@@ -53,9 +53,9 @@ export function FinalScoreCharts({
   ];
 
   return (
-    <section className="space-y-3">
-      <h2 className="text-lg md:text-xl font-display golden-text flex items-center gap-2">
-        <Trophy className="h-5 w-5" />
+    <section className="space-y-4">
+      <h2 className="text-xl md:text-2xl font-display golden-text flex items-center gap-2">
+        <Trophy className="h-6 w-6 md:h-7 md:w-7" />
         Final Scores
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -71,24 +71,24 @@ export function FinalScoreCharts({
               key={chart.key}
               className="golden-card animate-slide-up overflow-hidden"
             >
-              <CardHeader className="p-2 pb-1 md:p-4 md:pb-2">
-                <CardTitle className="text-xs md:text-base font-display flex items-center gap-1">
-                  <Crown className="h-3 w-3 md:h-4 md:w-4 text-primary" />
+              <CardHeader className="p-3 pb-1 md:p-5 md:pb-2">
+                <CardTitle className="text-base md:text-lg font-display flex items-center gap-2">
+                  <Crown className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                   <span className="golden-text">{chart.title}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-2 md:p-4 pt-0">
-                <div className="h-6 md:h-8 flex items-center justify-center">
+              <CardContent className="p-3 md:p-5 pt-0">
+                <div className="h-8 md:h-10 flex items-center justify-center">
                   {selectedEntry && (
-                    <div className="px-2 py-0.5 rounded-full bg-primary/20 border border-primary/30 animate-fade-in">
-                      <span className="text-[9px] md:text-sm font-medium golden-text truncate max-w-full">
-                        {selectedEntry.name}: {selectedEntry.value.toFixed(2)}
+                    <div className="px-3 py-1 rounded-full bg-primary/20 border border-primary/30 animate-fade-in">
+                      <span className="text-sm md:text-base font-medium golden-text truncate max-w-full">
+                        {selectedEntry.name}: {selectedEntry.value.toFixed(1)}
                       </span>
                     </div>
                   )}
                 </div>
                 
-                <div className="h-36 md:h-52">
+                <div className="h-48 md:h-60">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -124,10 +124,10 @@ export function FinalScoreCharts({
                           if (active && payload && payload.length) {
                             const data = payload[0].payload;
                             return (
-                              <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-lg">
-                                <p className="text-sm font-medium">{data.name}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  Final Score: <span className="text-primary font-bold">{data.value.toFixed(2)}</span>
+                              <div className="bg-card border border-border rounded-lg px-4 py-2.5 shadow-lg">
+                                <p className="text-base font-medium">{data.name}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  Final Score: <span className="text-primary font-bold text-base">{data.value.toFixed(1)}</span>
                                 </p>
                               </div>
                             );
@@ -136,11 +136,11 @@ export function FinalScoreCharts({
                         }}
                       />
                       <Legend 
-                        wrapperStyle={{ fontSize: '8px' }}
-                        iconSize={6}
+                        wrapperStyle={{ fontSize: '12px' }}
+                        iconSize={10}
                         formatter={(value) => (
-                          <span style={{ color: 'hsl(40, 15%, 70%)', fontSize: '8px' }}>
-                            {String(value).split(' ')[0].slice(0, 6)}
+                          <span style={{ color: 'hsl(40, 15%, 70%)', fontSize: '12px', fontWeight: 500 }}>
+                            {String(value).split(' ')[0].slice(0, 8)}
                           </span>
                         )}
                       />

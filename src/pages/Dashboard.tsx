@@ -46,11 +46,11 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-4 md:space-y-6">
+      <div className="space-y-5 md:space-y-8">
         {/* Header */}
         <div className="animate-fade-in">
-          <h1 className="text-xl md:text-3xl font-display golden-text">Dashboard</h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <h1 className="text-2xl md:text-4xl font-display golden-text">Dashboard</h1>
+          <p className="text-muted-foreground text-base md:text-lg mt-2">
             Overview of voting statistics • Total Voters: {totalVoters.totalCodes}
           </p>
         </div>
@@ -59,8 +59,8 @@ export default function Dashboard() {
         <StatsCards />
 
         {/* Charts - 2 columns */}
-        <section className="space-y-3">
-          <h2 className="text-lg md:text-xl font-display golden-text">Vote Distribution</h2>
+        <section className="space-y-4">
+          <h2 className="text-xl md:text-2xl font-display golden-text">Vote Distribution</h2>
           <VoteCharts />
         </section>
 

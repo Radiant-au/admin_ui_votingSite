@@ -41,7 +41,7 @@ export function StatsCards() {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
       {stats.map((stat, index) => (
         <Card 
           key={stat.label}
@@ -51,13 +51,13 @@ export function StatsCards() {
           <CardContent className="p-4 md:p-6 relative">
             <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full" />
             <div className="flex items-center gap-3 md:gap-4">
-              <div className={cn("p-2 md:p-3 rounded-xl border border-primary/20", stat.bgColor)}>
-                <stat.icon className={cn("h-5 w-5 md:h-6 md:w-6", stat.color)} />
+              <div className={cn("p-2.5 md:p-3 rounded-xl border border-primary/20", stat.bgColor)}>
+                <stat.icon className={cn("h-6 w-6 md:h-7 md:w-7", stat.color)} />
               </div>
               <div>
-                <p className="text-xs md:text-sm text-muted-foreground">{stat.label}</p>
+                <p className="text-sm md:text-base text-muted-foreground font-medium">{stat.label}</p>
                 <p className={cn(
-                  "text-xl md:text-2xl font-bold font-display",
+                  "text-xl md:text-3xl font-bold font-display",
                   (stat.label === 'Voting Status' || stat.label === 'Winner Status') ? stat.color : 'text-foreground'
                 )}>
                   {stat.value}
