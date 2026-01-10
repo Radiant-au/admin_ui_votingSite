@@ -2,10 +2,13 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { StatsCards } from '@/components/dashboard/StatsCards';
 import { CategoryTabs } from '@/components/dashboard/CategoryTabs';
 import { VoteCharts } from '@/components/dashboard/VoteCharts';
+import { FinalScoreCharts } from '@/components/dashboard/FinalScoreCharts';
 import { useVoteData } from '@/hooks/useVoteData';
+import { useDashboardScores } from '@/hooks/useDashboardScores';
 
 export default function Dashboard() {
   const { isLoading, totalVoters } = useVoteData();
+  const { maleScores, femaleScores, allMaleHaveScores, allFemaleHaveScores, isLoading: scoresLoading } = useDashboardScores();
 
   if (isLoading) {
     return (
@@ -60,6 +63,14 @@ export default function Dashboard() {
           <h2 className="text-lg md:text-xl font-display golden-text">Vote Distribution</h2>
           <VoteCharts />
         </section>
+
+        {/* Final Score Charts - Only show when all candidates have scores */}
+        <FinalScoreCharts 
+          maleScores={maleScores}
+          femaleScores={femaleScores}
+          allMaleHaveScores={allMaleHaveScores}
+          allFemaleHaveScores={allFemaleHaveScores}
+        />
 
         {/* Swipeable Category Tabs - No props needed */}
         <CategoryTabs />
