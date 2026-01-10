@@ -15,14 +15,14 @@ export interface CandidateScore {
 export function useDashboardScores() {
   const { data: maleScores, isLoading: maleLoading } = useQuery({
     queryKey: ['dashboardScores', 'MALE'],
-    queryFn: () => apiRequest<CandidateScore[]>('/winner/candidates?gender=male'),
+    queryFn: () => apiRequest<CandidateScore[]>('/admin/candidates?gender=MALE'),
     refetchInterval: 60 * 1000,
     staleTime: 10000,
   });
 
   const { data: femaleScores, isLoading: femaleLoading } = useQuery({
     queryKey: ['dashboardScores', 'FEMALE'],
-    queryFn: () => apiRequest<CandidateScore[]>('/winner/candidates?gender=female'),
+    queryFn: () => apiRequest<CandidateScore[]>('/admin/candidates?gender=FEMALE'),
     refetchInterval: 60 * 1000,
     staleTime: 10000,
   });
