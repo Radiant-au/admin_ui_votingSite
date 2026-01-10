@@ -71,18 +71,18 @@ export function CategoryTabs() {
   return (
     <section className="space-y-4 animate-slide-up">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg md:text-xl font-display golden-text">Candidates</h2>
-        <div className="flex items-center gap-1 text-muted-foreground text-xs">
+        <h2 className="text-xl md:text-2xl font-display golden-text">Candidates</h2>
+        <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
           <span>Swipe to navigate</span>
-          <ChevronLeft className="h-3 w-3" />
-          <ChevronRight className="h-3 w-3" />
+          <ChevronLeft className="h-4 w-4" />
+          <ChevronRight className="h-4 w-4" />
         </div>
       </div>
 
       {/* Tab Navigation - Horizontally Scrollable */}
       <div 
         ref={tabsContainerRef}
-        className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1"
+        className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
       {tabs.map((tab) => {
@@ -95,16 +95,16 @@ export function CategoryTabs() {
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 flex-shrink-0",
+                "flex items-center gap-2 px-4 py-2.5 rounded-lg text-base font-medium whitespace-nowrap transition-all duration-200 flex-shrink-0",
                 isActive
                   ? "bg-primary/20 border border-primary/40 text-primary shadow-lg shadow-primary/10"
                   : "bg-card/50 border border-border/50 text-muted-foreground hover:bg-card hover:border-primary/20"
               )}
             >
-              <Icon className={cn("h-4 w-4", isActive ? "text-primary" : "text-muted-foreground")} />
+              <Icon className={cn("h-5 w-5", isActive ? "text-primary" : "text-muted-foreground")} />
               <span>{tab.label}</span>
               <span className={cn(
-                "text-xs px-1.5 py-0.5 rounded-full",
+                "text-sm px-2 py-0.5 rounded-full font-semibold",
                 isActive ? "bg-primary/30 text-primary" : "bg-muted text-muted-foreground"
               )}>
                 {count}
