@@ -1,12 +1,17 @@
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Crown, Trophy } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { CandidateScore } from '@/hooks/useDashboardScores';
 
-const CHART_COLORS = [
-  '#FFD700', '#FF6B6B', '#4ECDC4', '#9B59B6', '#3498DB',
-  '#E67E22', '#1ABC9C', '#E91E63',
+const COLORS = [
+  'hsl(45, 90%, 55%)',   // primary (golden)
+  'hsl(35, 85%, 45%)',   // accent
+  'hsl(200, 80%, 50%)',  // blue
+  'hsl(280, 70%, 60%)',  // purple
+  'hsl(160, 60%, 45%)',  // teal
+  'hsl(10, 75%, 55%)',   // red-orange
+  'hsl(320, 65%, 55%)',  // pink
+  'hsl(200, 80%, 60%)',  // light blue
 ];
 
 interface FinalScoreChartsProps {
@@ -22,8 +27,6 @@ export function FinalScoreCharts({
   allMaleHaveScores,
   allFemaleHaveScores,
 }: FinalScoreChartsProps) {
-  const [activeIndex, setActiveIndex] = useState<{ [key: string]: number | null }>({});
-
   if (!allMaleHaveScores && !allFemaleHaveScores) {
     return null;
   }
@@ -34,23 +37,76 @@ export function FinalScoreCharts({
       .sort((a, b) => b.finalScore - a.finalScore)
       .map((c, index) => ({
         name: c.name,
-        shortName: c.name.split(' ')[0],
         value: c.finalScore,
-        fill: CHART_COLORS[index % CHART_COLORS.length],
+        color: COLORS[index % COLORS.length],
       }));
   };
 
-  const handlePieClick = (chartKey: string, index: number) => {
-    setActiveIndex(prev => ({
-      ...prev,
-      [chartKey]: prev[chartKey] === index ? null : index
-    }));
-  };
+  const renderChart = (
+    title: string,
+    icon: React.ReactNode,
+    data: { name: string; value: number; color: string }[],
+    show: boolean
+  ) => {
+    if (!show || data.length === 0) return null;
 
-  const chartConfig = [
-    { key: 'king', title: 'King Final Scores', data: createPieData(maleScores), show: allMaleHaveScores },
-    { key: 'queen', title: 'Queen Final Scores', data: createPieData(femaleScores), show: allFemaleHaveScores },
-  ];
+    return (
+      <Card className="golden-card">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-sm md:text-base">
+            {icon}
+            <span className="golden-text">{title}</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                innerRadius={40}
+                outerRadius={70}
+                paddingAngle={2}
+                dataKey="value"
+                labelLine={false}
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
+                ))}
+              </Pie>
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-lg">
+                        <p className="text-sm font-medium">{data.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Final Score: <span className="text-primary font-bold">{data.value.toFixed(1)}</span>
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Legend
+                layout="horizontal"
+                verticalAlign="bottom"
+                align="center"
+                iconType="circle"
+                iconSize={8}
+                formatter={(value) => (
+                  <span className="text-[10px] md:text-xs text-muted-foreground">{value}</span>
+                )}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <section className="space-y-3">
@@ -59,82 +115,18 @@ export function FinalScoreCharts({
         Final Scores
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {chartConfig.map((chart) => {
-          if (!chart.show || chart.data.length === 0) return null;
-
-          const selectedEntry = activeIndex[chart.key] !== null && activeIndex[chart.key] !== undefined
-            ? chart.data[activeIndex[chart.key]!]
-            : null;
-
-          return (
-            <Card 
-              key={chart.key}
-              className="golden-card animate-slide-up overflow-hidden"
-            >
-              <CardHeader className="p-2 pb-1 md:p-4 md:pb-2">
-                <CardTitle className="text-xs md:text-base font-display flex items-center gap-1">
-                  <Crown className="h-3 w-3 md:h-4 md:w-4 text-primary" />
-                  <span className="golden-text">{chart.title}</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-2 md:p-4 pt-0">
-                <div className="h-6 md:h-8 flex items-center justify-center">
-                  {selectedEntry && (
-                    <div className="px-2 py-0.5 rounded-full bg-primary/20 border border-primary/30 animate-fade-in">
-                      <span className="text-[9px] md:text-sm font-medium golden-text truncate max-w-full">
-                        {selectedEntry.name}: {selectedEntry.value.toFixed(2)}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="h-36 md:h-52">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={chart.data}
-                        cx="50%"
-                        cy="45%"
-                        innerRadius="30%"
-                        outerRadius="55%"
-                        paddingAngle={2}
-                        dataKey="value"
-                        stroke="hsl(30, 10%, 8%)"
-                        strokeWidth={1}
-                        onClick={(_, index) => handlePieClick(chart.key, index)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        {chart.data.map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={entry.fill}
-                            style={{ 
-                              filter: activeIndex[chart.key] === index 
-                                ? 'drop-shadow(0 0 6px rgba(255, 215, 0, 0.8))' 
-                                : 'none',
-                              transform: activeIndex[chart.key] === index ? 'scale(1.02)' : 'scale(1)',
-                              transformOrigin: 'center',
-                              transition: 'all 0.2s ease'
-                            }}
-                          />
-                        ))}
-                      </Pie>
-                      <Legend 
-                        wrapperStyle={{ fontSize: '8px' }}
-                        iconSize={6}
-                        formatter={(value) => (
-                          <span style={{ color: 'hsl(40, 15%, 70%)', fontSize: '8px' }}>
-                            {String(value).split(' ')[0].slice(0, 6)}
-                          </span>
-                        )}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+        {renderChart(
+          'King Final Scores',
+          <Crown className="h-4 w-4 text-primary" />,
+          createPieData(maleScores),
+          allMaleHaveScores
+        )}
+        {renderChart(
+          'Queen Final Scores',
+          <Crown className="h-4 w-4 text-primary" />,
+          createPieData(femaleScores),
+          allFemaleHaveScores
+        )}
       </div>
     </section>
   );
