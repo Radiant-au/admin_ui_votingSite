@@ -71,6 +71,7 @@ export default {
         },
         bronze: "hsl(var(--bronze))",
         champagne: "hsl(var(--champagne))",
+        cream: "hsl(var(--cream))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

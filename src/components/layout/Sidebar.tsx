@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, Vote, LogOut, Menu, X, Crown, UserPlus, ClipboardList } from 'lucide-react';
+import { LayoutDashboard, Users, Vote, LogOut, Menu, X, Crown, UserPlus, ClipboardList, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuthContext } from '@/context/AuthContext';
@@ -10,7 +10,8 @@ const navItems = [
   { to: '/candidates', icon: Users, label: 'Candidates', roles: ['admin'] },
   { to: '/scoring', icon: ClipboardList, label: 'Scoring', roles: ['admin'] },
   { to: '/moderators', icon: UserPlus, label: 'Moderators', roles: ['admin'] },
-  { to: '/control', icon: Vote, label: 'Control', roles: ['admin'] }
+  { to: '/control', icon: Vote, label: 'Control', roles: ['admin'] },
+  { to: '/reveal', icon: Sparkles, label: 'Reveal Winners', roles: ['admin'] }
 ];
 
 export function Sidebar() {

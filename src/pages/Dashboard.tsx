@@ -48,7 +48,7 @@ export default function Dashboard() {
         <div className="animate-fade-in">
           <h1 className="text-xl md:text-3xl font-display golden-text">Dashboard</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Overview of voting statistics • Total Voters: {totalVoters.toLocaleString()}
+            Overview of voting statistics • Total Voters: {totalVoters.totalCodes}
           </p>
         </div>
 

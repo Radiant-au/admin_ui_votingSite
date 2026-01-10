@@ -9,8 +9,6 @@ export function StatsCards() {
   const { data: votingStatusData, isLoading: votingLoading } = useVotingStatus();
   const { data: winnerStatusData, isLoading: winnerLoading } = useWinnerStatus();
 
-  console.log(totalVoters)
-
   const stats = [
     {
       label: 'Total PinCodes',

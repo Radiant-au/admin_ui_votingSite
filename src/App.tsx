@@ -9,6 +9,7 @@ import Candidates from "./pages/Candidates";
 import Control from "./pages/Control";
 import Moderators from "./pages/Moderators";
 import Scoring from "./pages/Scoring";
+import FinalWinnersReveal from "./pages/FinalWinnersReveal";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/scoring" element={<ProtectedRoute adminOnly><Scoring /></ProtectedRoute>} />
           <Route path="/moderators" element={<ProtectedRoute adminOnly><Moderators /></ProtectedRoute>} />
           <Route path="/control" element={<ProtectedRoute adminOnly><Control /></ProtectedRoute>} />
+          <Route path="/reveal" element={<ProtectedRoute adminOnly><FinalWinnersReveal /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

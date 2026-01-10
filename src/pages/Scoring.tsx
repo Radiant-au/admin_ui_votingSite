@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,19 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, Trophy, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
-import { apiRequest, apiPutJson } from "@/api/apiClient";
 import { toast } from "@/hooks/use-toast";
+import { useCandidatesWithScores, useSaveWinner, CandidateWithScores } from "@/hooks/useWinners";
 
-interface ScoringCandidate {
-  id: number;
-  name: string;
-  profileImg: string;
-  studentVotes: number;
-  teacherScore: number;
-  committeeScore: number;
-  finalScore: number;
-  hasScores: boolean;
-}
 
 interface ScoreInputState {
   teacherScore: string;
@@ -29,24 +19,22 @@ interface ScoreInputState {
     teacherScore?: string;
     committeeScore?: string;
   };
-  isSubmitting: boolean;
 }
 
 const ScoringCard = ({ 
   candidate, 
   onScoreSubmitted 
 }: { 
-  candidate: ScoringCandidate; 
+  candidate: CandidateWithScores; 
   onScoreSubmitted: () => void;
 }) => {
   const [state, setState] = useState<ScoreInputState>({
     teacherScore: candidate.hasScores ? candidate.teacherScore.toString() : "",
     committeeScore: candidate.hasScores ? candidate.committeeScore.toString() : "",
     errors: {},
-    isSubmitting: false,
   });
 
-  const validateScore = (value: string, fieldName: string): string | undefined => {
+  const validateScore = (value: string, fieldName: string, max: number): string | undefined => {
     if (!value.trim()) {
       return `${fieldName} is required`;
     }
@@ -54,15 +42,17 @@ const ScoringCard = ({
     if (isNaN(num)) {
       return "Must be a valid number";
     }
-    if (num < 0 || num > 10) {
-      return "Must be between 0 and 10";
+    if (num < 0 || num > max) {
+      return `Must be between 0 and ${max}`;
     }
     return undefined;
   };
 
-  const handleSubmit = async () => {
-    const teacherError = validateScore(state.teacherScore, "Teacher score");
-    const committeeError = validateScore(state.committeeScore, "Committee score");
+  const saveWinnerMutation = useSaveWinner();
+
+  const handleSubmit = () => {
+    const teacherError = validateScore(state.teacherScore, "Teacher score", 100);
+    const committeeError = validateScore(state.committeeScore, "Committee score", 10);
 
     if (teacherError || committeeError) {
       setState(prev => ({
@@ -75,29 +65,33 @@ const ScoringCard = ({
       return;
     }
 
-    setState(prev => ({ ...prev, isSubmitting: true, errors: {} }));
+    setState(prev => ({ ...prev, errors: {} }));
 
-    try {
-      await apiPutJson(`/admin/candidates/${candidate.id}/score`, {
-        teacherScore: parseFloat(state.teacherScore),
-        committeeScore: parseFloat(state.committeeScore),
-      });
-
-      toast({
-        title: "Score Submitted",
-        description: `Scores for ${candidate.name} have been saved successfully.`,
-      });
-
-      onScoreSubmitted();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to submit scores. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setState(prev => ({ ...prev, isSubmitting: false }));
-    }
+    saveWinnerMutation.mutate(
+      {
+        id: candidate.id,
+        scores: {
+          teacherScore: parseFloat(state.teacherScore),
+          committeeScore: parseFloat(state.committeeScore),
+        },
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Score Submitted",
+            description: `Scores for ${candidate.name} have been saved successfully.`,
+          });
+          onScoreSubmitted();
+        },
+        onError: () => {
+          toast({
+            title: "Error",
+            description: "Failed to submit scores. Please try again.",
+            variant: "destructive",
+          });
+        },
+      }
+    );
   };
 
   return (
@@ -136,7 +130,7 @@ const ScoringCard = ({
                   id={`teacher-${candidate.id}`}
                   type="number"
                   min="0"
-                  max="10"
+                  max="100"
                   step="0.1"
                   placeholder="0.0"
                   value={state.teacherScore}
@@ -147,7 +141,7 @@ const ScoringCard = ({
                   }))}
                   className={state.errors.teacherScore ? "border-destructive" : ""}
                 />
-                <span className="text-muted-foreground font-medium">/ 10</span>
+                <span className="text-muted-foreground font-medium">/ 100</span>
               </div>
               {state.errors.teacherScore && (
                 <p className="text-sm text-destructive flex items-center gap-1">
@@ -191,10 +185,10 @@ const ScoringCard = ({
           {/* Submit Button */}
           <Button 
             onClick={handleSubmit} 
-            disabled={state.isSubmitting}
+            disabled={saveWinnerMutation.isPending}
             className="w-full"
           >
-            {state.isSubmitting ? (
+            {saveWinnerMutation.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Submitting...
@@ -215,7 +209,7 @@ const ScoringCard = ({
               <span className="font-semibold">Final Score:</span>
               {candidate.hasScores ? (
                 <span className="text-xl font-bold text-primary">
-                  {candidate.finalScore.toFixed(1)} / 100
+                  {Number(candidate.finalScore).toFixed(2)} / 100
                 </span>
               ) : (
                 <span className="text-muted-foreground">--</span>
@@ -235,38 +229,16 @@ const ScoringCard = ({
 };
 
 const Scoring = () => {
-  const [activeTab, setActiveTab] = useState<"MALE" | "FEMALE">("MALE");
-  const [candidates, setCandidates] = useState<ScoringCandidate[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchCandidates = async (gender: "MALE" | "FEMALE") => {
-    setIsLoading(true);
-    try {
-      const data = await apiRequest<ScoringCandidate[]>(`/admin/candidates?gender=${gender}`);
-      // Sort by final score (highest first), then by name
-      const sorted = data.sort((a, b) => {
-        if (b.finalScore !== a.finalScore) return b.finalScore - a.finalScore;
-        return a.name.localeCompare(b.name);
-      });
-      setCandidates(sorted);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load candidates. Please try again.",
-        variant: "destructive",
-      });
-      setCandidates([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCandidates(activeTab);
-  }, [activeTab]);
+  const [activeTab, setActiveTab] = useState<"male" | "female">("male");
+  const { data: candidates = [], isLoading, refetch } = useCandidatesWithScores(activeTab);
+  // Sort candidates by final score (highest first), then by name
+  const sortedCandidates = [...candidates].sort((a, b) => {
+    if (b.finalScore !== a.finalScore) return b.finalScore - a.finalScore;
+    return a.name.localeCompare(b.name);
+  });
 
   const handleScoreSubmitted = () => {
-    fetchCandidates(activeTab);
+    refetch();
   };
 
   return (
@@ -279,24 +251,24 @@ const Scoring = () => {
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "MALE" | "FEMALE")}>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "male" | "female")}>
           <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="MALE">Male Candidates</TabsTrigger>
-            <TabsTrigger value="FEMALE">Female Candidates</TabsTrigger>
+            <TabsTrigger value="male">Male Candidates</TabsTrigger>
+            <TabsTrigger value="female">Female Candidates</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="MALE" className="mt-6">
+          <TabsContent value="male" className="mt-6">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
-            ) : candidates.length === 0 ? (
+            ) : sortedCandidates.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 No male candidates found
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {candidates.map((candidate) => (
+                {sortedCandidates.map((candidate) => (
                   <ScoringCard
                     key={candidate.id}
                     candidate={candidate}
@@ -307,18 +279,18 @@ const Scoring = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="FEMALE" className="mt-6">
+          <TabsContent value="female" className="mt-6">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
-            ) : candidates.length === 0 ? (
+            ) : sortedCandidates.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 No female candidates found
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {candidates.map((candidate) => (
+                {sortedCandidates.map((candidate) => (
                   <ScoringCard
                     key={candidate.id}
                     candidate={candidate}
