@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react';
-import { CandidateCard } from './CandidateCard';
-import { Crown, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CompactCandidateCard } from './CompactCandidateCard';
+import { Crown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useVoteData } from '@/hooks/useVoteData';
+import { useDashboardScores } from '@/hooks/useDashboardScores';
 
 type CandidateType = 'king' | 'queen';
 
@@ -12,7 +12,7 @@ const tabs: { key: CandidateType; label: string; icon: typeof Crown }[] = [
 ];
 
 export function CategoryTabs() {
-  const { getCandidatesByType, getVotePercentage, isLoading } = useVoteData();
+  const { maleScores, femaleScores, isLoading } = useDashboardScores();
   const [activeTab, setActiveTab] = useState<CandidateType>('king');
   const tabsContainerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
@@ -49,7 +49,9 @@ export function CategoryTabs() {
     }
   };
 
-  const candidates = getCandidatesByType(activeTab);
+  const candidates = activeTab === 'king' 
+    ? maleScores.sort((a, b) => b.finalScore - a.finalScore)
+    : femaleScores.sort((a, b) => b.finalScore - a.finalScore);
 
   if (isLoading) {
     return (
@@ -83,10 +85,10 @@ export function CategoryTabs() {
         className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {tabs.map((tab) => {
+      {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
-          const count = getCandidatesByType(tab.key).length;
+          const count = tab.key === 'king' ? maleScores.length : femaleScores.length;
           
           return (
             <button
@@ -142,13 +144,13 @@ export function CategoryTabs() {
           <ChevronRight className="h-5 w-5" />
         </button>
 
-        {/* Candidates Grid - 2 Columns */}
-        <div className="grid grid-cols-2 gap-2 md:gap-4 px-0 md:px-12">
+        {/* Candidates Grid - Single Column for Compact Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 px-0 md:px-12">
           {candidates.map((candidate, index) => (
-            <CandidateCard 
-              key={candidate.selectionId} 
+            <CompactCandidateCard 
+              key={candidate.id} 
               candidate={candidate}
-              percentage={getVotePercentage(candidate.selectionId)}
+              type={activeTab}
               index={index}
             />
           ))}
