@@ -4,14 +4,14 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { CandidateScore } from '@/hooks/useDashboardScores';
 
 const COLORS = [
-  'hsl(45, 90%, 55%)',   // primary (golden)
-  'hsl(35, 85%, 45%)',   // accent
-  'hsl(200, 80%, 50%)',  // blue
-  'hsl(280, 70%, 60%)',  // purple
-  'hsl(160, 60%, 45%)',  // teal
-  'hsl(10, 75%, 55%)',   // red-orange
-  'hsl(320, 65%, 55%)',  // pink
-  'hsl(200, 80%, 60%)',  // light blue
+  '#E6A817',  // golden
+  '#B8860B',  // dark golden
+  '#3B82F6',  // blue
+  '#A855F7',  // purple
+  '#14B8A6',  // teal
+  '#EF4444',  // red
+  '#EC4899',  // pink
+  '#60A5FA',  // light blue
 ];
 
 interface FinalScoreChartsProps {
@@ -65,14 +65,16 @@ export function FinalScoreCharts({
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius={40}
-                outerRadius={70}
-                paddingAngle={2}
+                innerRadius={35}
+                outerRadius={65}
+                paddingAngle={3}
                 dataKey="value"
                 labelLine={false}
+                animationBegin={0}
+                animationDuration={800}
               >
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
+                  <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
                 ))}
               </Pie>
               <Tooltip
