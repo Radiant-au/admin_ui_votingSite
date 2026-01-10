@@ -8,7 +8,7 @@ import {
   Legend
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Crown } from 'lucide-react';
+import { Crown, Sparkles } from 'lucide-react';
 
 const CHART_COLORS = [
   '#FFD700', '#FF6B6B', '#4ECDC4', '#9B59B6', '#3498DB',
