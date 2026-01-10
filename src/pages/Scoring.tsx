@@ -209,7 +209,7 @@ const ScoringCard = ({
               <span className="font-semibold">Final Score:</span>
               {candidate.hasScores ? (
                 <span className="text-xl font-bold text-primary">
-                  {Number(candidate.finalScore).toFixed(2)} / 100
+                  {candidate.finalScore.toFixed(2)} / 100
                 </span>
               ) : (
                 <span className="text-muted-foreground">--</span>
