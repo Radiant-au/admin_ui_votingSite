@@ -1,66 +1,26 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import ParticleSystem from '@/components/reveal/ParticleSystem';
 import ConfettiBurst from '@/components/reveal/ConfettiBurst';
 import LightRays from '@/components/reveal/LightRays';
 import WinnerCard, { Winner } from '@/components/reveal/WinnerCard';
-import { RotateCcw } from 'lucide-react';
-
-// Mock winner data - for demonstration purposes
-const MOCK_WINNERS: Winner[] = [
-  {
-    id: '1',
-    name: 'Alexander Chen',
-    title: 'KING',
-    department: 'College of Engineering',
-    year: '4th Year',
-    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-    votes: 2847,
-    teacherScore: 92,
-    committeeScore: 9,
-    finalScore: 94.7,
-  },
-  {
-    id: '2',
-    name: 'Isabella Martinez',
-    title: 'QUEEN',
-    department: 'College of Arts & Sciences',
-    year: '3rd Year',
-    photoUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face',
-    votes: 3124,
-    teacherScore: 95,
-    committeeScore: 10,
-    finalScore: 97.2,
-  },
-  {
-    id: '3',
-    name: 'Marcus Williams',
-    title: 'PRINCE',
-    department: 'School of Business',
-    year: '2nd Year',
-    photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
-    votes: 2156,
-    teacherScore: 88,
-    committeeScore: 8,
-    finalScore: 89.4,
-  },
-  {
-    id: '4',
-    name: 'Sophia Kim',
-    title: 'PRINCESS',
-    department: 'College of Nursing',
-    year: '2nd Year',
-    photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
-    votes: 2398,
-    teacherScore: 90,
-    committeeScore: 9,
-    finalScore: 91.8,
-  },
-];
+import { RotateCcw, Crown, Loader2 } from 'lucide-react';
+import { usefinalWinner } from '@/hooks/useWinners';
 
 const FinalWinnersReveal = () => {
   const [revealedCards, setRevealedCards] = useState<Set<string>>(new Set());
   const [showCelebration, setShowCelebration] = useState(false);
   const [particleMode, setParticleMode] = useState<'ambient' | 'celebration'>('ambient');
+  const [winnersUnlocked, setWinnersUnlocked] = useState(false);
+
+  // Fetch final winners
+  const { data: winnersData, isLoading, isError, refetch } = usefinalWinner();
+
+  // Auto-fetch when component mounts or when unlocked
+  useEffect(() => {
+    if (winnersUnlocked) {
+      refetch();
+    }
+  }, [winnersUnlocked, refetch]);
 
   const handleRevealCard = useCallback((winnerId: string) => {
     setRevealedCards(prev => new Set([...prev, winnerId]));
@@ -79,13 +39,94 @@ const FinalWinnersReveal = () => {
     setParticleMode('ambient');
   }, []);
 
-  // Reorder winners: King, Queen, Prince, Princess
-  const orderedWinners = [
-    MOCK_WINNERS.find(w => w.title === 'KING')!,
-    MOCK_WINNERS.find(w => w.title === 'QUEEN')!,
-    MOCK_WINNERS.find(w => w.title === 'PRINCE')!,
-    MOCK_WINNERS.find(w => w.title === 'PRINCESS')!,
-  ];
+  const handleUnlockWinners = useCallback(() => {
+    setWinnersUnlocked(true);
+  }, []);
+
+  // Transform API data to Winner format
+  const transformWinnerData = useCallback((apiData: typeof winnersData): Winner[] => {
+    if (!apiData) return [];
+
+    const winners: Winner[] = [];
+
+    // Helper function to calculate final score
+    const calculateFinalScore = (voteCount: number, teacherScore: number, committeeScore: number) => {
+      // Assuming: 70% votes, 20% teacher, 10% committee
+      const maxVotes = Math.max(
+        apiData.King?.voteCount || 0,
+        apiData.Queen?.voteCount || 0,
+        apiData.Prince?.voteCount || 0,
+        apiData.Princess?.voteCount || 0
+      );
+      const votePercentage = maxVotes > 0 ? (voteCount / maxVotes) * 100 : 0;
+      return (votePercentage * 0.7) + (teacherScore * 0.2) + (committeeScore * 10 * 0.1);
+    };
+
+    if (apiData.King) {
+      winners.push({
+        id: apiData.King.selectionId.toString(),
+        name: apiData.King.selectionName,
+        title: 'KING',
+        department: apiData.King.major,
+        year: '', // Not needed, but required by interface
+        photoUrl: apiData.King.profileImg || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+        votes: apiData.King.voteCount,
+        teacherScore: apiData.King.teacher_score,
+        committeeScore: apiData.King.commitee_score,
+        finalScore: calculateFinalScore(apiData.King.voteCount, apiData.King.teacher_score, apiData.King.commitee_score),
+      });
+    }
+
+    if (apiData.Queen) {
+      winners.push({
+        id: apiData.Queen.selectionId.toString(),
+        name: apiData.Queen.selectionName,
+        title: 'QUEEN',
+        department: apiData.Queen.major,
+        year: '', // Not needed, but required by interface
+        photoUrl: apiData.Queen.profileImg || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face',
+        votes: apiData.Queen.voteCount,
+        teacherScore: apiData.Queen.teacher_score,
+        committeeScore: apiData.Queen.commitee_score,
+        finalScore: calculateFinalScore(apiData.Queen.voteCount, apiData.Queen.teacher_score, apiData.Queen.commitee_score),
+      });
+    }
+
+    if (apiData.Prince) {
+      winners.push({
+        id: apiData.Prince.selectionId.toString(),
+        name: apiData.Prince.selectionName,
+        title: 'PRINCE',
+        department: apiData.Prince.major,
+        year: '', // Not needed, but required by interface
+        photoUrl: apiData.Prince.profileImg || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
+        votes: apiData.Prince.voteCount,
+        teacherScore: apiData.Prince.teacher_score,
+        committeeScore: apiData.Prince.commitee_score,
+        finalScore: calculateFinalScore(apiData.Prince.voteCount, apiData.Prince.teacher_score, apiData.Prince.commitee_score),
+      });
+    }
+
+    if (apiData.Princess) {
+      winners.push({
+        id: apiData.Princess.selectionId.toString(),
+        name: apiData.Princess.selectionName,
+        title: 'PRINCESS',
+        department: apiData.Princess.major,
+        year: '', // Not needed, but required by interface
+        photoUrl: apiData.Princess.profileImg || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
+        votes: apiData.Princess.voteCount,
+        teacherScore: apiData.Princess.teacher_score,
+        committeeScore: apiData.Princess.commitee_score,
+        finalScore: calculateFinalScore(apiData.Princess.voteCount, apiData.Princess.teacher_score, apiData.Princess.commitee_score),
+      });
+    }
+
+    return winners;
+  }, []);
+
+  // Get winners in correct order
+  const orderedWinners = transformWinnerData(winnersData);
 
   return (
     <div className="h-screen bg-background relative overflow-hidden flex flex-col">
@@ -128,22 +169,84 @@ const FinalWinnersReveal = () => {
         </div>
       </header>
 
-      {/* Winner Cards Grid - fills remaining space */}
+      {/* Main Content Area */}
       <main className="relative z-10 flex-1 flex items-center justify-center px-6 pb-20">
-        <div className="grid grid-cols-4 gap-6 max-w-[1600px] w-full">
-          {orderedWinners.map((winner) => (
-            <WinnerCard
-              key={winner.id}
-              winner={winner}
-              revealed={revealedCards.has(winner.id)}
-              onReveal={() => handleRevealCard(winner.id)}
-            />
-          ))}
-        </div>
+        {!winnersUnlocked ? (
+          /* Unlock Screen */
+          <div className="text-center">
+            <div className="mb-8 inline-flex items-center justify-center w-24 h-24 rounded-full glass-card">
+              <Crown className="w-12 h-12 text-gold" />
+            </div>
+            <h2 className="font-display text-3xl text-gold-gradient mb-4">
+              Winners Are Ready
+            </h2>
+            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+              Click the button below to reveal the final winners of Coronation 2026
+            </p>
+            <button
+              onClick={handleUnlockWinners}
+              className="px-8 py-4 rounded-full bg-gradient-to-r from-gold/20 to-gold/10 border border-gold/30 text-gold font-display tracking-wider hover:from-gold/30 hover:to-gold/20 transition-all duration-300 hover:scale-105"
+            >
+              Unlock Winners
+            </button>
+          </div>
+        ) : isLoading ? (
+          /* Loading State */
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 text-gold animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground font-display tracking-wider">
+              Loading winners...
+            </p>
+          </div>
+        ) : isError ? (
+          /* Error State */
+          <div className="text-center">
+            <div className="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-500/10 border border-red-500/30">
+              <span className="text-3xl">⚠️</span>
+            </div>
+            <h2 className="font-display text-2xl text-red-400 mb-4">
+              Failed to Load Winners
+            </h2>
+            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+              There was an error loading the winner data. Please try again.
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="px-6 py-3 rounded-full glass-card text-muted-foreground hover:text-cream transition-colors duration-300"
+            >
+              Retry
+            </button>
+          </div>
+        ) : orderedWinners.length === 0 ? (
+          /* No Data State */
+          <div className="text-center">
+            <div className="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-full glass-card">
+              <Crown className="w-10 h-10 text-muted-foreground" />
+            </div>
+            <h2 className="font-display text-2xl text-muted-foreground mb-4">
+              No Winners Available
+            </h2>
+            <p className="text-muted-foreground/70 max-w-md mx-auto">
+              Winner data has not been configured yet. Please check back later.
+            </p>
+          </div>
+        ) : (
+          /* Winner Cards Grid */
+          <div className="grid grid-cols-4 gap-6 max-w-[1600px] w-full">
+            {orderedWinners.map((winner) => (
+              <WinnerCard
+                key={winner.id}
+                winner={winner}
+                revealed={revealedCards.has(winner.id)}
+                onReveal={() => handleRevealCard(winner.id)}
+              />
+            ))}
+          </div>
+        )}
       </main>
 
-      {/* Reset Button - only show when at least one is revealed */}
-      {revealedCards.size > 0 && (
+      {/* Reset Button - only show when at least one is revealed and winners are loaded */}
+      {winnersUnlocked && !isLoading && !isError && orderedWinners.length > 0 && revealedCards.size > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
           <button
             onClick={handleReset}
