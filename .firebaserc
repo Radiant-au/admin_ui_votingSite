@@ -1,5 +1,20 @@
 {
   "projects": {
     "default": "my-utycc-project"
-  }
+  },
+  "targets": {
+    "default": {
+      "hosting": {
+        "target": "voteadmin"
+      }
+    },
+    "my-utycc-project": {
+      "hosting": {
+        "voteadmin": [
+          "voteadmin"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

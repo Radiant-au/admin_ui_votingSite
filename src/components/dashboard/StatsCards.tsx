@@ -25,7 +25,7 @@ export function StatsCards() {
       bgColor: winnerStatusData?.status === 'OPEN' ? 'bg-success/10' : 'bg-destructive/10',
     },
     {
-      label: 'PinCodes Voted',
+      label: 'Students Voted',
       value: votesLoading ? '...' : totalVoters.votedCodes,
       icon: KeyRound,
       color: 'text-accent',

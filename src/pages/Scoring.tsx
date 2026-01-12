@@ -52,7 +52,7 @@ const ScoringCard = ({
 
   const handleSubmit = () => {
     const teacherError = validateScore(state.teacherScore, "Teacher score", 100);
-    const committeeError = validateScore(state.committeeScore, "Committee score", 10);
+    const committeeError = validateScore(state.committeeScore, "Committee score", 100);
 
     if (teacherError || committeeError) {
       setState(prev => ({
@@ -160,7 +160,7 @@ const ScoringCard = ({
                   id={`committee-${candidate.id}`}
                   type="number"
                   min="0"
-                  max="10"
+                  max="100"
                   step="0.1"
                   placeholder="0.0"
                   value={state.committeeScore}
@@ -171,7 +171,7 @@ const ScoringCard = ({
                   }))}
                   className={state.errors.committeeScore ? "border-destructive" : ""}
                 />
-                <span className="text-muted-foreground font-medium">/ 10</span>
+                <span className="text-muted-foreground font-medium">/ 100</span>
               </div>
               {state.errors.committeeScore && (
                 <p className="text-sm text-destructive flex items-center gap-1">

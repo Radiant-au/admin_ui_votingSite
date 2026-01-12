@@ -1,11 +1,17 @@
 {
   "hosting": {
-    "site" : "voteadmin",
     "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],   
+    "target": "voteadmin",
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   }
 }

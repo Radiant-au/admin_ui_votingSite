@@ -27,3 +27,6 @@ dist-ssr
 #build
 dist
 
+#firebase
+.firebase/*
+

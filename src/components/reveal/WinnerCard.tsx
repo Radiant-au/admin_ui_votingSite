@@ -58,7 +58,7 @@ const WinnerCard = ({ winner, revealed, onReveal }: WinnerCardProps) => {
       >
         {/* Hidden overlay with reveal button */}
         {!revealed && (
-          <div className="absolute inset-0 z-20 rounded-2xl bg-background/95 backdrop-blur-2xl flex flex-col items-center justify-center">
+          <div className="absolute inset-0 z-20 rounded-2xl bg-background backdrop-blur-3xl flex flex-col items-center justify-center">
             {/* Mystery silhouette */}
             <div className="w-20 h-20 rounded-full bg-muted/20 mb-4 flex items-center justify-center">
               <div className="w-16 h-16 rounded-full bg-muted/30 blur-sm" />
@@ -136,18 +136,18 @@ const WinnerCard = ({ winner, revealed, onReveal }: WinnerCardProps) => {
             </div>
             <div className="flex justify-between items-center py-1.5 border-b border-gold/20">
               <span className="text-muted-foreground">👨‍🏫 Teacher</span>
-              <span className="text-cream font-semibold">{winner.teacherScore}/100</span>
+              <span className="text-cream font-semibold">{winner.teacherScore}%</span>
             </div>
             <div className="flex justify-between items-center py-1.5 border-b border-gold/20">
               <span className="text-muted-foreground">🧑‍⚖️ Committee</span>
-              <span className="text-cream font-semibold">{winner.committeeScore}/10</span>
+              <span className="text-cream font-semibold">{winner.committeeScore}%</span>
             </div>
 
             {/* Final Score */}
             <div className="mt-auto pt-3 text-center">
               <p className="text-muted-foreground uppercase tracking-widest text-xs mb-1">Final Score</p>
               <span className="text-score-gradient text-4xl font-display font-bold">
-                {winner.finalScore.toFixed(1)}
+                {winner.finalScore.toFixed(2)}
               </span>
             </div>
           </div>

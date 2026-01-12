@@ -60,7 +60,7 @@ export default function Dashboard() {
 
         {/* Charts - 2 columns */}
         <section className="space-y-4">
-          <h2 className="text-xl md:text-2xl font-display golden-text">Vote Distribution</h2>
+          <h2 className="text-xl md:text-2xl font-display golden-text">Student Vote Distribution</h2>
           <VoteCharts />
         </section>
 

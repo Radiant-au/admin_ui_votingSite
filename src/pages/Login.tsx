@@ -74,7 +74,7 @@ export default function Login() {
             <Crown className="h-8 w-8 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">VoteAdmin</h1>
+            <h1 className="text-2xl font-bold text-foreground">Admin</h1>
             <p className="text-muted-foreground mt-1">Sign in to manage voting</p>
           </div>
         </CardHeader>
