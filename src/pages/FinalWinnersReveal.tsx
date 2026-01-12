@@ -49,19 +49,6 @@ const FinalWinnersReveal = () => {
 
     const winners: Winner[] = [];
 
-    // Helper function to calculate final score
-    const calculateFinalScore = (voteCount: number, teacherScore: number, committeeScore: number) => {
-      // Assuming: 70% votes, 20% teacher, 10% committee
-      const maxVotes = Math.max(
-        apiData.King?.voteCount || 0,
-        apiData.Queen?.voteCount || 0,
-        apiData.Prince?.voteCount || 0,
-        apiData.Princess?.voteCount || 0
-      );
-      const votePercentage = maxVotes > 0 ? (voteCount / maxVotes) * 100 : 0;
-      return (votePercentage * 0.7) + (teacherScore * 0.2) + (committeeScore * 10 * 0.1);
-    };
-
     if (apiData.King) {
       winners.push({
         id: apiData.King.selectionId.toString(),
@@ -73,7 +60,7 @@ const FinalWinnersReveal = () => {
         votes: apiData.King.voteCount,
         teacherScore: apiData.King.teacher_score,
         committeeScore: apiData.King.commitee_score,
-        finalScore: calculateFinalScore(apiData.King.voteCount, apiData.King.teacher_score, apiData.King.commitee_score),
+        finalScore: apiData.King.final_score,
       });
     }
 
@@ -88,7 +75,7 @@ const FinalWinnersReveal = () => {
         votes: apiData.Queen.voteCount,
         teacherScore: apiData.Queen.teacher_score,
         committeeScore: apiData.Queen.commitee_score,
-        finalScore: calculateFinalScore(apiData.Queen.voteCount, apiData.Queen.teacher_score, apiData.Queen.commitee_score),
+        finalScore: apiData.Queen.final_score,
       });
     }
 
@@ -103,7 +90,7 @@ const FinalWinnersReveal = () => {
         votes: apiData.Prince.voteCount,
         teacherScore: apiData.Prince.teacher_score,
         committeeScore: apiData.Prince.commitee_score,
-        finalScore: calculateFinalScore(apiData.Prince.voteCount, apiData.Prince.teacher_score, apiData.Prince.commitee_score),
+        finalScore: apiData.Prince.final_score,
       });
     }
 
@@ -118,7 +105,7 @@ const FinalWinnersReveal = () => {
         votes: apiData.Princess.voteCount,
         teacherScore: apiData.Princess.teacher_score,
         committeeScore: apiData.Princess.commitee_score,
-        finalScore: calculateFinalScore(apiData.Princess.voteCount, apiData.Princess.teacher_score, apiData.Princess.commitee_score),
+        finalScore: apiData.Princess.final_score,
       });
     }
 

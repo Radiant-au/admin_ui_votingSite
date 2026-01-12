@@ -28,6 +28,7 @@ export interface Winner{
   voteCount: number;
   teacher_score: number;
   commitee_score: number;
+  final_score: number;
   profileImg: string;
 }
 
