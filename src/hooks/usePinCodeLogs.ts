@@ -12,7 +12,7 @@ export interface PinCodeLog {
 export function usePinCodeLogs() {
   return useQuery<PinCodeLog[]>({
     queryKey: ['pincode-logs'],
-    queryFn: () => apiRequest<PinCodeLog[]>('/admin/pincodes/logs'),
+    queryFn: () => apiRequest<PinCodeLog[]>('/pinCode/logs'),
     staleTime: 30000,
   });
 }
