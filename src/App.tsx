@@ -10,6 +10,7 @@ import Control from "./pages/Control";
 import Moderators from "./pages/Moderators";
 import Scoring from "./pages/Scoring";
 import FinalWinnersReveal from "./pages/FinalWinnersReveal";
+import PinCodeLogs from "./pages/PinCodeLogs";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/moderators" element={<ProtectedRoute adminOnly><Moderators /></ProtectedRoute>} />
           <Route path="/control" element={<ProtectedRoute adminOnly><Control /></ProtectedRoute>} />
           <Route path="/reveal" element={<ProtectedRoute adminOnly><FinalWinnersReveal /></ProtectedRoute>} />
+          <Route path="/pincode-logs" element={<ProtectedRoute adminOnly><PinCodeLogs /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
