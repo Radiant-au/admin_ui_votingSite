@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface WinnerScoreRequest {
   teacherScore: number; // 0-100
-  committeeScore: number; // 0-10
+  committeeScore: number; // 0-100
 }
 
 export interface CandidateWithScores {

@@ -19,6 +19,7 @@ import { Plus, Pencil, Trash2, Crown, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCandidates, useDeleteCandidate, UTSelection } from '@/hooks/useCandidates';
 import { useAuthContext } from '@/context/AuthContext';
+import { ApiError } from '@/api/apiClient';
 
 export default function Candidates() {
   const { user } = useAuthContext();
@@ -44,8 +45,8 @@ export default function Candidates() {
         toast({ title: 'Candidate deleted successfully' });
         setDeleteId(null);
       })
-      .catch(() => {
-        toast({ title: 'Error deleting candidate', variant: 'destructive' });
+      .catch((error: ApiError) => {
+        toast({ title: 'Error deleting candidate', description: error.message, variant: 'destructive' });
       });
   };
 

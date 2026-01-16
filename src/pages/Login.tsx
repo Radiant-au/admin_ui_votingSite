@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { Crown, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useAuthContext } from '@/context/AuthContext';
+import { ApiError } from '@/api/apiClient';
 
 const schema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -40,23 +41,28 @@ export default function Login() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const success = await login(data.username, data.password);
-      if (success) {
-        toast({ title: 'Welcome back!', description: 'Login successful' });
-        navigate('/dashboard');
-        return;
-      }
+      await login(data.username, data.password);
+  
       toast({
-        title: 'Login failed',
-        description: 'Invalid username or password',
-        variant: 'destructive',
+        title: "Welcome back!",
+        description: "Login successful",
       });
+  
+      navigate("/dashboard");
     } catch (error) {
-      toast({
-        title: 'Login failed',
-        description: 'Unable to sign in. Please check server and credentials.',
-        variant: 'destructive',
-      });
+      if (error instanceof ApiError) {
+        toast({
+          title: "Login failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Login failed",
+          description: "Unexpected error occurred",
+          variant: "destructive",
+        });
+      }
     }
   };
 

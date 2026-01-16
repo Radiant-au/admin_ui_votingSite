@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 type AuthContextValue = {
   token: string | null;
   isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   user: { username: string; role: string } | null;
 };
@@ -18,20 +18,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Initialize state with token from localStorage
   const [token, setTokenState] = useState<string | null>(() => getToken());
 
-  const login = async (username: string, password: string) => {
-    try {
-      const { token: newToken } = await apiJson<AdminLoginResponse>(
-        '/auth/Alogin',
-        { username, password },
-        { auth: false }
-      );
-      setToken(newToken); // Save to localStorage
-      setTokenState(newToken); // Update state to trigger re-render
-      return true;
-    } catch (error) {
-      console.error("Login failed:", error);
-      return false;
-    }
+  const login = async (username: string, password: string): Promise<void> => {
+    const { token: newToken } = await apiJson<AdminLoginResponse>(
+      "/auth/Alogin",
+      { username, password },
+      { auth: false }
+    );
+  
+    setToken(newToken);
+    setTokenState(newToken);
   };
 
   const logout = () => {
