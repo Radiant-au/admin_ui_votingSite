@@ -261,8 +261,8 @@ npm run lint   # ESLint
 
 ## ✦ Author
 
-Built by **[Your Name]**  
-[Portfolio](https://your-portfolio.dev) · [LinkedIn](https://linkedin.com/in/yourhandle) · [GitHub](https://github.com/your-username)
+Built by **[Aung Kaung Sett]**  
+[Portfolio](https://your-portfolio.dev) · [LinkedIn](https://www.linkedin.com/in/aung-kaung-sett-42ba25197/) · [GitHub](https://github.com/Radiant-au)
 
 ---
 
